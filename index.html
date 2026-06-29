@@ -104,23 +104,18 @@
         .shift-block-input { background: var(--accent-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
         .shift-block-title { font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 時計ピッカー */
-        .time-picker-ui { display: flex; flex-direction: column; align-items: center; background: var(--surface); padding: 8px; border-radius: 10px; border: 1px solid var(--border); margin-top: 4px; gap: 6px; }
-        .time-range-display { font-size: 13px; font-weight: 800; color: var(--primary-light); text-align: center; }
-        .clocks-row { display: flex; gap: 10px; justify-content: center; width: 100%; }
-        .clock-wrapper { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .clock-wrapper span { font-size: 10px; font-weight: 700; color: var(--text-sub); }
+       /* 時計ピッカー */
+        .time-picker-ui { display: flex; flex-direction: column; align-items: center; background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-top: 8px; gap: 10px; }
         
-        .ampm-box { display: flex; background: #e2e8f0; padding: 2px; border-radius: 5px; width: 64px; margin-bottom: 2px; }
-        .ampm-btn { flex: 1; border: none; background: transparent; font-size: 9px; font-weight: 800; padding: 2px 0; cursor: pointer; border-radius: 3px; color: var(--text-sub); }
-        .ampm-btn.active { background: var(--surface); color: var(--primary-light); font-weight: 900; }
-
-        .clock-container { width: 96px; height: 96px; border-radius: 50%; background: var(--surface); border: 2px solid var(--primary); position: relative; touch-action: none; }
-        .clock-center { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .hand-hour { width: 3px; height: 22px; background: var(--primary); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
-        .hand-minute { width: 2px; height: 32px; background: var(--primary-light); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
-        .clock-number { position: absolute; font-size: 8px; font-weight: 800; color: #94a3b8; transform: translate(-50%, -50%); pointer-events: none; }
-
+        /* 時計のコンテナ*/
+        .clock-container { width: 144px; height: 144px; border-radius: 50%; background: var(--surface); border: 3px solid var(--primary); position: relative; touch-action: none; }
+        
+        /* 時計の針 */
+        .hand-hour { width: 4px; height: 35px; background: var(--primary); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
+        .hand-minute { width: 3px; height: 50px; background: var(--primary-light); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
+        
+        /* 数字の配置を調整 */
+        .clock-number { position: absolute; font-size: 10px; font-weight: 800; color: #94a3b8; transform: translate(-50%, -50%); pointer-events: none; }
         .btn-submit { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; width: 100%; min-height: 44px; margin-top: 6px; box-shadow: 0 2px 4px rgba(30,58,138,0.15); }
         .btn-submit:active { background: #172554; }
         .btn-remove-block { background: transparent; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; padding: 4px; }
@@ -465,8 +460,8 @@
                 const num = document.createElement('div');
                 num.className = 'clock-number'; num.innerText = i;
                 const angle = (i * 30) * Math.PI / 180;
-                num.style.left = (48 + Math.sin(angle) * 34) + 'px';
-                num.style.top = (50 - Math.cos(angle) * 34) + 'px';
+                num.style.left = (72 + Math.sin(angle) * 54) + 'px';
+                num.style.top = (72 - Math.cos(angle) * 54) + 'px';
                 clock.appendChild(num);
             }
 
