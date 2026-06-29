@@ -272,18 +272,43 @@
         let appData = JSON.parse(localStorage.getItem('v17_appMasterData')) || { shifts: {}, expenses: {} };
 
         const monthSelect = document.getElementById('global-month');
-        const currentTargetDate = new Date();
-        currentTargetDate.setMonth(currentTargetDate.getMonth() + 1); 
 
-        for (let i = -6; i <= 6; i++) {
-            const d = new Date(); d.setMonth(d.getMonth() + i + 1);
-            const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            const option = document.createElement('option');
-            option.value = mKey; option.innerText = `${d.getFullYear()}年${d.getMonth() + 1}月 支給分`;
-            if (i === 0) option.selected = true;
-            monthSelect.appendChild(option);
-        }
-        let activeMonth = monthSelect.value;
+// 2026年6月(index: 5) から 2027年4月(index: 3) までのデータを配列で固定定義
+const availableMonths = [
+    { key: "2026-06", text: "2026年6月 支給分" },
+    { key: "2026-07", text: "2026年7月 支給分" },
+    { key: "2026-08", text: "2026年8月 支給分" },
+    { key: "2026-09", text: "2026年9月 支給分" },
+    { key: "2026-10", text: "2026年10月 支給分" },
+    { key: "2026-11", text: "2026年11月 支給分" },
+    { key: "2026-12", text: "2026年12月 支給分" },
+    { key: "2027-01", text: "2027年1月 支給分" },
+    { key: "2027-02", text: "2027年2月 支給分" },
+    { key: "2027-03", text: "2027年3月 支給分" },
+    { key: "2027-04", text: "2027年4月 支給分" }
+];
+
+// 現在の年月を取得して、初期の選択状態を自動判定するための準備
+const now = new Date();
+const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+availableMonths.forEach(m => {
+    const option = document.createElement('option');
+    option.value = m.key;
+    option.innerText = m.text;
+    // 現在の月と一致する場合、または一致するものがなくリストの最初（2026-06）の場合はそれを初期選択にする
+    if (m.key === currentKey) {
+        option.selected = true;
+    }
+    monthSelect.appendChild(option);
+});
+
+// 現在の月に該当するものが選択されていなければ、2026年6月を初期値にする
+if (monthSelect.selectedIndex === -1) {
+    monthSelect.selectedIndex = 0;
+}
+
+let activeMonth = monthSelect.value;
 
         window.onload = function() {
             resetShiftForm();
