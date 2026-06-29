@@ -284,12 +284,6 @@ display: block;
 
 <script>
 // 日付の初期状態判定ロジック
-let lastUsedDate = localStorage.getItem('v17_lastUsedDate');
-if (lastUsedDate) {
-document.getElementById('shift-date').value = lastUsedDate;
-} else {
-document.getElementById('shift-date').valueAsDate = new Date();
-}
 
 let globalCampus = '亀戸';
 let expCampus = '亀戸', expBase64 = "";
@@ -360,22 +354,247 @@ addShiftBlock('保育', { ampm: 'PM', hour: 3, minute: 0 }, { ampm: 'PM', hour: 
 addShiftBlock('絵画造形', { ampm: 'PM', hour: 4, minute: 0 }, { ampm: 'PM', hour: 6, minute: 0 });
 }
 
+// --- シフト登録用関数 ---
+function addShiftBlock(defaultJob = '保育', startObj = {ampm:'PM', hour:3, minute:0}, endObj = {ampm:'PM', hour:6, minute:0}) {
+    shiftBlockCount++;
+    const id = shiftBlockCount;
+
+    const blockHtml = `
+        <div class="shift-block-input" id="block-${id}">
+            <div class="shift-block-title">
+                <span>セッション</span>
+                <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
+            </div>
+            <div class="pill-box job-pills">
+                <button type="button" class="pill-btn ${defaultJob==='保育'?'active':''}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
+                <button type="button" class="pill-btn ${defaultJob==='絵画造形'?'active':''}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
+            </div>
+            <div style="display:flex; gap:5px;">
+                <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})"></select>
+                <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})"></select>
+            </div>
+            <div id="display-${id}" style="margin-top:8px; font-weight:800; color:var(--primary-light);">0.00h</div>
+        </div>`;
+
+    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
+    
+    // 状態を初期化
+    const block = document.getElementById(`block-${id}`);
+    block.timeState = { 
+        job: defaultJob, 
+        wage: defaultJob === '絵画造形' ? 1600 : 1400,
+        start: startObj,
+        end: endObj
+    };
+
+    fillTimeOptions(document.getElementById(`start-${id}`), startObj);
+    fillTimeOptions(document.getElementById(`end-${id}`), endObj);
+    calculateBlockTime(id);
+}
+
+// --- 時刻選択肢の生成 ---
+function fillTimeOptions(sel, time) {
+    for (let h = 1; h <= 12; h++) {
+        ['AM', 'PM'].forEach(ampm => {
+            for (let m = 0; m < 60; m += 5) {
+                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
+                sel.add(new Option(val, val, false, selected));
+            }
+        });
+    }
+}
+
+
+
+
+// --- 職種切り替え ---
+function setBlockJob(id, job, wage, btn) {
+    const block = document.getElementById(`block-${id}`);
+    block.timeState.job = job;
+    block.timeState.wage = wage;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// --- ブロック削除 ---
+function removeShiftBlock(id) {
+    const block = document.getElementById(`block-${id}`);
+    if (block) block.remove();
+}
+        
+// --- シフト登録用関数 ---
+// --- シフト登録用関数 (最新版に置換) ---
 function addShiftBlock(defaultJob = '保育', startDefault = {ampm:'PM', hour:3, minute:0}, endDefault = {ampm:'PM', hour:6, minute:0}) {
     shiftBlockCount++;
     const id = shiftBlockCount;
 
-　　const blockHtml = `
-            <div class="shift-block-input" id="block-${id}">
-                <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})"></select>
-                <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})"></select>
-                <div id="display-${id}">0.00h</div>
-            </div>`;
-document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
-// ここで fillTimeOptions を呼び出す
-      
-setupClockMechanics(id, true);
-setupClockMechanics(id, false);
-calculateBlockTime(id);
+    const blockHtml = `
+        <div class="shift-block-input" id="block-${id}" data-block-id="${id}">
+            <div class="shift-block-title">
+                <span>セッション</span>
+                <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
+            </div>
+            <label class="group-label">職種</label>
+            <div class="pill-box job-pills">
+                <button type="button" class="pill-btn ${defaultJob==='保育'?'active':''}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
+                <button type="button" class="pill-btn ${defaultJob==='絵画造形'?'active':''}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
+                <button type="button" class="pill-btn ${defaultJob==='インターン'?'active':''}" onclick="setBlockJob(${id}, 'インターン', 1400, this)">インターン</button>
+                <button type="button" class="pill-btn ${defaultJob==='その他'?'active':''}" onclick="setBlockJob(${id}, 'その他', 0, this)">その他</button>
+            </div>
+            <div class="field">
+                <label>時刻選択</label>
+                <div style="display:flex; gap:5px;">
+                    <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:8px;"></select>
+                    <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:8px;"></select>
+                </div>
+            </div>
+            <div id="display-${id}" style="margin-top:8px; font-weight:800; color:var(--primary-light);">0.00h</div>
+        </div>`;
+
+    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
+    
+    document.getElementById(`block-${id}`).timeState = { 
+        job: defaultJob, 
+        wage: defaultJob==='絵画造形'?1600:1400 
+    };
+
+    fillTimeOptions(document.getElementById(`start-${id}`), startDefault);
+    fillTimeOptions(document.getElementById(`end-${id}`), endDefault);
+    updateTimeFromSelect(id);
+}
+
+// --- 時刻オプション生成関数 (新規追加) ---
+function fillTimeOptions(sel, time) {
+    for (let h = 1; h <= 12; h++) {
+        ['AM', 'PM'].forEach(ampm => {
+            for (let m = 0; m < 60; m += 5) {
+                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
+                sel.add(new Option(val, val, false, selected));
+            }
+        });
+    }
+}
+
+// --- 時刻計算・表示用関数 (新規追加) ---
+function updateTimeFromSelect(id) {
+    const block = document.getElementById(`block-${id}`);
+    if(!block) return;
+    const s = document.getElementById(`start-${id}`).value.split(' ');
+    const e = document.getElementById(`end-${id}`).value.split(' ');
+    const to24 = (ampm, t) => { 
+        let [h, m] = t.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h + (m / 60);
+    };
+    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
+    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
+    block.timeState.calculatedHours = diff;
+}
+
+// --- 職種ボタン制御 (新規追加) ---
+function setBlockJob(id, job, wage, btn) {
+    const block = document.getElementById(`block-${id}`);
+    block.timeState.job = job;
+    block.timeState.wage = wage;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// --- 時刻オプション生成 ---
+function fillTimeOptions(sel, time) {
+    sel.innerHTML = '';
+    for (let h = 1; h <= 12; h++) {
+        ['AM', 'PM'].forEach(ampm => {
+            for (let m = 0; m < 60; m += 5) {
+                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
+                sel.add(new Option(val, val, false, selected));
+            }
+        });
+    }
+}
+
+// --- 時刻計算 ---
+function updateTimeFromSelect(id) {
+    const block = document.getElementById(`block-${id}`);
+    if(!block) return;
+    const s = document.getElementById(`start-${id}`).value.split(' ');
+    const e = document.getElementById(`end-${id}`).value.split(' ');
+    const to24 = (ampm, t) => { 
+        let [h, m] = t.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h + (m / 60);
+    };
+    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
+    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
+    block.timeState.calculatedHours = diff;
+}
+
+// --- ブロック削除 ---
+function removeShiftBlock(id) {
+    const block = document.getElementById(`block-${id}`);
+    if (block) block.remove();
+}
+
+    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
+    
+    // ここでプルダウンの中身を作る
+    const startSel = document.getElementById(`start-${id}`);
+    const endSel = document.getElementById(`end-${id}`);
+    fillTimeOptions(startSel, startDefault);
+    fillTimeOptions(endSel, endDefault);
+    
+    // 状態を保持するためのオブジェクト作成
+    document.getElementById(`block-${id}`).timeState = { job: defaultJob, wage: 1400 };
+    updateTimeFromSelect(id);
+}
+                
+    // 初期状態を保持
+    const blockEl = document.getElementById(`block-${id}`);
+    blockEl.timeState = { 
+        job: defaultJob, 
+        wage: defaultJob==='絵画造形'?1600:1400, 
+        start: startDefault, 
+        end: endDefault 
+    };
+
+    fillTimeOptions(document.getElementById(`start-${id}`), startDefault);
+    fillTimeOptions(document.getElementById(`end-${id}`), endDefault);
+    updateTimeFromSelect(id);
+}
+
+function fillTimeOptions(sel, time) {
+    for (let h = 1; h <= 12; h++) {
+        ['AM', 'PM'].forEach(ampm => {
+            for (let m = 0; m < 60; m += 5) {
+                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
+                sel.add(new Option(val, val, false, selected));
+            }
+        });
+    }
+}
+
+function updateTimeFromSelect(id) {
+    const block = document.getElementById(`block-${id}`);
+    if(!block) return;
+    const s = document.getElementById(`start-${id}`).value.split(' ');
+    const e = document.getElementById(`end-${id}`).value.split(' ');
+    const to24 = (ampm, t) => { 
+        let [h, m] = t.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h + (m / 60);
+    };
+    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
+    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
+    block.timeState.start = { ampm: s[0], hour: parseInt(s[1].split(':')[0]), minute: parseInt(s[1].split(':')[1]) };
+    block.timeState.end = { ampm: e[0], hour: parseInt(e[1].split(':')[0]), minute: parseInt(e[1].split(':')[1]) };
+    block.timeState.calculatedHours = diff;
 }
 
 function removeShiftBlock(id) {
@@ -400,12 +619,7 @@ function calculateBlockTime(id) {
     const block = document.getElementById(`block-${id}`);
     if (!block) return;
     const state = block.timeState;
-    function to24(obj) {
-        let h = obj.hour;
-        if (obj.ampm === 'PM' && h !== 12) h += 12;
-        if (obj.ampm === 'AM' && h === 12) h = 0;
-        return h + (obj.minute / 60);
-    }
+  
     const start24 = to24(state.start);
     const end24 = to24(state.end);
     let diff = end24 - start24;
@@ -447,12 +661,6 @@ const end24 = to24(state.end);
 let diff = end24 - start24;
 if (diff < 0) diff += 24;
 
-function pad(obj) {
-return `${obj.ampm} ${String(obj.hour).padStart(2,'0')}:${String(obj.minute).padStart(2,'0')}`;
-}
-block.querySelector(`#display-${id}`).innerText = `${pad(state.start)} ～ ${pad(state.end)} (${diff.toFixed(2)}h)`;
-state.calculatedHours = diff;
-}
 
 function editDayGroup(dateKey) {
 const shiftsToEdit = appData.shifts[activeMonth].filter(s => s.date === dateKey);
