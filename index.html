@@ -62,7 +62,20 @@
         .form-stack { display: flex; flex-direction: column; gap: 12px; }
         .field { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .field label { font-size: 11px; font-weight: 700; color: var(--text-sub); }
-        .field input { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; background: var(--accent-bg); color: var(--text-main); width: 100%; min-height: 42px; outline: none; transition: border 0.2s; max-width: 100%; display: block; }
+        .field input { 
+            padding: 10px 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            font-size: 14px; 
+            background: var(--accent-bg); 
+            color: var(--text-main); 
+            width: 100%; 
+            min-height: 42px; 
+            outline: none; 
+            transition: border 0.2s; 
+            box-sizing: border-box;
+            display: block;
+        }
         .field input:focus { border-color: var(--primary-light); background: var(--surface); }
         
         .hidden { display: none !important; }
