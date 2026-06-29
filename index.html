@@ -185,40 +185,7 @@
 
         <div class="main-layout">
             
-            <div class="panel">
-                <div class="panel-title" id="expense-panel-title">経費を登録</div>
-                <label class="group-label">対象のキャンパス</label>
-                <div class="pill-box" id="exp-campus-pills">
-                    <button type="button" class="pill-btn active" onclick="setExpCampus('亀戸', this)">亀戸</button>
-                    <button type="button" class="pill-btn" onclick="setExpCampus('下高井戸', this)">下高井戸</button>
-                </div>
-                <div class="form-stack">
-                    <div class="field">
-                        <label>購入金額 ¥</label>
-                        <input type="number" id="exp-amount" placeholder="¥1,280" inputmode="numeric">
-                    </div>
-                    <div class="field">
-                        <label>品名・用途</label>
-                        <input type="text" id="exp-note" placeholder="画用紙、絵の具など">
-                    </div>
-                    <div class="field">
-                        <label>レシート写真</label>
-                        <div class="upload-container" onclick="document.getElementById('exp-file').click()">
-                            <div class="modern-upload-zone" id="upload-zone">
-                                <svg class="upload-icon" viewBox="0 0 24 24">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                                </svg>
-                                <span class="upload-text-main" id="exp-file-label">タップして領収書をインポート</span>
-                                <span class="upload-text-sub">高画質・WebP形式で保管されます</span>
-                            </div>
-                            <input type="file" id="exp-file" accept="image/*" onchange="processExpenseImage(this)">
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn-submit" id="btn-save-expense" onclick="submitExpense()">経費を保存</button>
-                <div class="expense-mini-list" id="expense-mini-list"></div>
-            </div>
-
+            <!-- 【配置変更】シフト登録を上に配置 -->
             <div class="panel">
                 <div class="panel-title" id="form-panel-title">本日のシフトを登録</div>
                 
@@ -263,6 +230,41 @@
                 <button type="button" class="btn-submit" id="btn-save-shift" onclick="submitAllShifts()">シフトを一括保存</button>
             </div>
 
+            <!-- 【配置変更】経費登録を下に配置 -->
+            <div class="panel">
+                <div class="panel-title" id="expense-panel-title">経費を登録</div>
+                <label class="group-label">対象のキャンパス</label>
+                <div class="pill-box" id="exp-campus-pills">
+                    <button type="button" class="pill-btn active" onclick="setExpCampus('亀戸', this)">亀戸</button>
+                    <button type="button" class="pill-btn" onclick="setExpCampus('下高井戸', this)">下高井戸</button>
+                </div>
+                <div class="form-stack">
+                    <div class="field">
+                        <label>購入金額 ¥</label>
+                        <input type="number" id="exp-amount" placeholder="¥1,280" inputmode="numeric">
+                    </div>
+                    <div class="field">
+                        <label>品名・用途</label>
+                        <input type="text" id="exp-note" placeholder="画用紙、絵の具など">
+                    </div>
+                    <div class="field">
+                        <label>レシート写真</label>
+                        <div class="upload-container" onclick="document.getElementById('exp-file').click()">
+                            <div class="modern-upload-zone" id="upload-zone">
+                                <svg class="upload-icon" viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                                </svg>
+                                <span class="upload-text-main" id="exp-file-label">タップして領収書をインポート</span>
+                                <span class="upload-text-sub">高画質・WebP形式で保管されます</span>
+                            </div>
+                            <input type="file" id="exp-file" accept="image/*" onchange="processExpenseImage(this)">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-submit" id="btn-save-expense" onclick="submitExpense()">経費を保存</button>
+                <div class="expense-mini-list" id="expense-mini-list"></div>
+            </div>
+
             <div class="panel">
                 <div class="panel-title">シフト履歴一覧</div>
                 <div id="shift-mobile-list" class="mobile-list"></div>
@@ -274,7 +276,13 @@
     <div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src=""></div>
 
     <script>
-        document.getElementById('shift-date').valueAsDate = new Date();
+        // 日付の初期状態判定ロジック
+        let lastUsedDate = localStorage.getItem('v17_lastUsedDate');
+        if (lastUsedDate) {
+            document.getElementById('shift-date').value = lastUsedDate;
+        } else {
+            document.getElementById('shift-date').valueAsDate = new Date();
+        }
 
         let globalCampus = '亀戸';
         let expCampus = '亀戸', expBase64 = "";
@@ -284,7 +292,6 @@
 
         let appData = JSON.parse(localStorage.getItem('v17_appMasterData')) || { shifts: {}, expenses: {} };
 
-        // 最もシンプルな月プルダウン生成処理（2026年6月〜2027年4月固定）
         const monthSelect = document.getElementById('global-month');
         for (let i = 0; i < 11; i++) {
             const d = new Date(2026, 5 + i, 1);
@@ -321,6 +328,14 @@
             document.getElementById('shift-blocks-container').innerHTML = '';
             document.getElementById('custom-allowance').value = '0';
             document.getElementById('shift-memo').value = '';
+            
+            // 保存済みの最終利用日付があればそれをセット、無ければ今日の日付
+            let savedDate = localStorage.getItem('v17_lastUsedDate');
+            if (savedDate) {
+                document.getElementById('shift-date').value = savedDate;
+            } else {
+                document.getElementById('shift-date').valueAsDate = new Date();
+            }
             
             addShiftBlock('保育', { ampm: 'PM', hour: 3, minute: 0 }, { ampm: 'PM', hour: 4, minute: 0 });
             addShiftBlock('絵画造形', { ampm: 'PM', hour: 4, minute: 0 }, { ampm: 'PM', hour: 6, minute: 0 });
@@ -515,7 +530,7 @@
             transitInput.value = first.transit;
 
             let targetCampusBtn = null;
-            document.querySelectorAll('.panel:nth-child(2) .pill-box:nth-of-type(1) .pill-btn').forEach(btn => {
+            document.querySelectorAll('.panel:nth-child(1) .pill-box:nth-of-type(1) .pill-btn').forEach(btn => {
                 if (btn.innerText === first.campus) targetCampusBtn = btn;
             });
             if (targetCampusBtn) setGlobalCampus(first.campus, targetCampusBtn);
@@ -559,6 +574,9 @@
             const memo = document.getElementById('shift-memo').value || "";
 
             if (!date) { alert('日付を指定してください。'); return; }
+
+            // 新機能：利用した日付を永続データとして内部保持
+            localStorage.setItem('v17_lastUsedDate', date);
 
             const blocks = document.querySelectorAll('.shift-block-input');
             if (blocks.length === 0) { alert('セッションを1つ以上追加してください。'); return; }
@@ -622,7 +640,6 @@
             btn.classList.add('active');
         }
 
-        // 高画質化（縮小を完全に廃止。WebPクオリティ0.90）
         function processExpenseImage(input) {
             const file = input.files[0]; if (!file) return;
             const zone = document.getElementById('upload-zone');
@@ -744,7 +761,6 @@
             const displayMonthText = activeMonth.split('-')[1];
             document.getElementById('salary-card-title').innerText = `${parseInt(displayMonthText)}月20日 支給額`;
 
-            // スマホ向け縦積みリストUIのレンダリング
             const mList = document.getElementById('shift-mobile-list'); mList.innerHTML = '';
             let grandHours = 0, grandSalary = 0;
 
