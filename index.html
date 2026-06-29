@@ -101,23 +101,6 @@ display: block;
 .shift-block-input { background: var(--accent-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
 .shift-block-title { font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-/* 時計ピッカー */
-.time-picker-ui { display: flex; flex-direction: column; align-items: center; background: var(--surface); padding: 8px; border-radius: 10px; border: 1px solid var(--border); margin-top: 4px; gap: 6px; }
-.time-range-display { font-size: 13px; font-weight: 800; color: var(--primary-light); text-align: center; }
-.clocks-row { display: flex; gap: 10px; justify-content: center; width: 100%; }
-.clock-wrapper { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.clock-wrapper span { font-size: 10px; font-weight: 700; color: var(--text-sub); }
-
-.ampm-box { display: flex; background: #e2e8f0; padding: 2px; border-radius: 5px; width: 64px; margin-bottom: 2px; }
-.ampm-btn { flex: 1; border: none; background: transparent; font-size: 9px; font-weight: 800; padding: 2px 0; cursor: pointer; border-radius: 3px; color: var(--text-sub); }
-.ampm-btn.active { background: var(--surface); color: var(--primary-light); font-weight: 900; }
-
-.clock-container { width: 96px; height: 96px; border-radius: 50%; background: var(--surface); border: 2px solid var(--primary); position: relative; touch-action: none; }
-.clock-center { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.hand-hour { width: 3px; height: 22px; background: var(--primary); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
-.hand-minute { width: 2px; height: 32px; background: var(--primary-light); position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; }
-.clock-number { position: absolute; font-size: 8px; font-weight: 800; color: #94a3b8; transform: translate(-50%, -50%); pointer-events: none; }
-
 .btn-submit { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; width: 100%; min-height: 44px; margin-top: 6px; box-shadow: 0 2px 4px rgba(30,58,138,0.15); }
 .btn-submit:active { background: #172554; }
 .btn-remove-block { background: transparent; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; padding: 4px; }
@@ -377,60 +360,19 @@ addShiftBlock('保育', { ampm: 'PM', hour: 3, minute: 0 }, { ampm: 'PM', hour: 
 addShiftBlock('絵画造形', { ampm: 'PM', hour: 4, minute: 0 }, { ampm: 'PM', hour: 6, minute: 0 });
 }
 
-function addShiftBlock(defaultJob = '保育', startDefault = {ampm:'PM', hour:1, minute:0}, endDefault = {ampm:'PM', hour:5, minute:30}) {
-shiftBlockCount++;
-const id = shiftBlockCount;
+function addShiftBlock(defaultJob = '保育', startDefault = {ampm:'PM', hour:3, minute:0}, endDefault = {ampm:'PM', hour:6, minute:0}) {
+    shiftBlockCount++;
+    const id = shiftBlockCount;
 
-const blockHtml = `
-           <div class="shift-block-input" id="block-${id}" data-block-id="${id}">
-               <div class="shift-block-title">
-                   <span>セッション</span>
-                   <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
-               </div>
-               <label class="group-label">職種</label>
-               <div class="pill-box job-pills">
-                   <button type="button" class="pill-btn ${defaultJob==='保育'?'active':''}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
-                   <button type="button" class="pill-btn ${defaultJob==='絵画造形'?'active':''}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
-                   <button type="button" class="pill-btn ${defaultJob==='インターン'?'active':''}" onclick="setBlockJob(${id}, 'インターン', 1400, this)">インターン</button>
-                   <button type="button" class="pill-btn ${defaultJob==='その他'?'active':''}" onclick="setBlockJob(${id}, 'その他', 0, this)">その他</button>
-               </div>
-               <div class="field hidden custom-wage-wrapper">
-                   <label>カスタム時給 ¥</label>
-                   <input type="number" class="custom-wage-input" placeholder="¥1,200">
-               </div>
-               
-               <div class="time-picker-ui">
-                   <div class="time-range-display" id="display-${id}">00:00 ～ 00:00 (0.00h)</div>
-                   <div class="clocks-row">
-                       <div class="clock-wrapper">
-                           <div class="ampm-box">
-                               <button type="button" class="ampm-btn ${startDefault.ampm==='AM'?'active':''}" onclick="setBlockAmpm(${id}, true, 'AM', this)">AM</button>
-                               <button type="button" class="ampm-btn ${startDefault.ampm==='PM'?'active':''}" onclick="setBlockAmpm(${id}, true, 'PM', this)">PM</button>
-                           </div>
-                           <div class="clock-container c-start" id="clock-start-${id}"><div class="clock-center"></div><div class="hand-hour"></div><div class="hand-minute"></div></div>
-                           <span>開始</span>
-                       </div>
-                       <div class="clock-wrapper">
-                           <div class="ampm-box">
-                               <button type="button" class="ampm-btn ${endDefault.ampm==='AM'?'active':''}" onclick="setBlockAmpm(${id}, false, 'AM', this)">AM</button>
-                               <button type="button" class="ampm-btn ${endDefault.ampm==='PM'?'active':''}" onclick="setBlockAmpm(${id}, false, 'PM', this)">PM</button>
-                           </div>
-                           <div class="clock-container c-end" id="clock-end-${id}"><div class="clock-center"></div><div class="hand-hour"></div><div class="hand-minute"></div></div>
-                           <span>終了</span>
-                       </div>
-                   </div>
-               </div>
-           </div>`;
-
+　　const blockHtml = `
+            <div class="shift-block-input" id="block-${id}">
+                <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})"></select>
+                <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})"></select>
+                <div id="display-${id}">0.00h</div>
+            </div>`;
 document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
-
-const blockEl = document.getElementById(`block-${id}`);
-blockEl.timeState = {
-job: defaultJob, wage: defaultJob==='絵画造形'?1600:1400,
-start: { ampm: startDefault.ampm, hour: startDefault.hour, minute: startDefault.minute },
-end: { ampm: endDefault.ampm, hour: endDefault.hour, minute: endDefault.minute }
-};
-
+// ここで fillTimeOptions を呼び出す
+      
 setupClockMechanics(id, true);
 setupClockMechanics(id, false);
 calculateBlockTime(id);
@@ -441,94 +383,57 @@ const block = document.getElementById(`block-${id}`);
 if (block) block.remove();
 }
 
-function setBlockJob(id, job, wage, btn) {
-const block = document.getElementById(`block-${id}`);
-block.timeState.job = job; block.timeState.wage = wage;
-btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-const customField = block.querySelector('.custom-wage-wrapper');
-if (job === 'その他') customField.classList.remove('hidden');
-else customField.classList.add('hidden');
+function updateTimeFromSelect(id) {
+    const s = document.getElementById(`start-${id}`).value.split(' ');
+    const e = document.getElementById(`end-${id}`).value.split(' ');
+    const to24 = (ampm, t) => { 
+        let [h, m] = t.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h + (m / 60);
+    };
+    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
+    document.getElementById(`display-${id}`).innerText = `${diff.toFixed(2)}h`;
 }
-
-function setBlockAmpm(id, isStart, mode, btn) {
-const block = document.getElementById(`block-${id}`);
-const target = isStart ? block.timeState.start : block.timeState.end;
-target.ampm = mode;
-btn.parentElement.querySelectorAll('.ampm-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-calculateBlockTime(id);
-}
-
-function setupClockMechanics(blockId, isStart) {
-const block = document.getElementById(`block-${blockId}`);
-const clock = block.querySelector(isStart ? '.c-start' : '.c-end');
-const state = isStart ? block.timeState.start : block.timeState.end;
-
-for (let i = 1; i <= 12; i++) {
-const num = document.createElement('div');
-num.className = 'clock-number'; num.innerText = i;
-const angle = (i * 30) * Math.PI / 180;
-num.style.left = (48 + Math.sin(angle) * 34) + 'px';
-num.style.top = (50 - Math.cos(angle) * 34) + 'px';
-clock.appendChild(num);
-}
-
-const hHand = clock.querySelector('.hand-hour');
-const mHand = clock.querySelector('.hand-minute');
-
-function updateHands() {
-hHand.style.transform = `rotate(${state.hour * 30}deg)`;
-mHand.style.transform = `rotate(${state.minute * 6}deg)`;
-}
-updateHands();
-
-let activeHand = null;
-
-function onMove(e) {
-const rect = clock.getBoundingClientRect();
-const centerX = rect.left + rect.width / 2;
-const centerY = rect.top + rect.height / 2;
-const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-let angle = Math.atan2(clientX - centerX, centerY - clientY) * (180 / Math.PI);
-if (angle < 0) angle += 360;
-
-if (activeHand === 'hour') {
-let h = Math.round(angle / 30);
-state.hour = (h === 0 || h === 12) ? 12 : h;
-} else if (activeHand === 'minute') {
-let m = Math.round(angle / 30) * 5;
-state.minute = (m === 60 || m === 0) ? 0 : m;
-}
-updateHands();
-calculateBlockTime(blockId);
-}
-
-function onStart(e) {
-const rect = clock.getBoundingClientRect();
-const centerX = rect.left + rect.width / 2;
-const centerY = rect.top + rect.height / 2;
-const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-const dist = Math.sqrt(Math.pow(clientX - centerX, 2) + Math.pow(clientY - centerY, 2));
-activeHand = (dist < 22) ? 'hour' : 'minute';
-onMove(e);
-}
-
-clock.addEventListener('mousedown', onStart);
-window.addEventListener('mousemove', (e) => { if (activeHand) onMove(e); });
-window.addEventListener('mouseup', () => activeHand = null);
-clock.addEventListener('touchstart', onStart, {passive:true});
-window.addEventListener('touchmove', (e) => { if (activeHand) onMove(e); }, {passive:false});
-window.addEventListener('touchend', () => activeHand = null);
-}
-
+        
 function calculateBlockTime(id) {
-const block = document.getElementById(`block-${id}`);
-if (!block) return;
-const state = block.timeState;
+    const block = document.getElementById(`block-${id}`);
+    if (!block) return;
+    const state = block.timeState;
+    function to24(obj) {
+        let h = obj.hour;
+        if (obj.ampm === 'PM' && h !== 12) h += 12;
+        if (obj.ampm === 'AM' && h === 12) h = 0;
+        return h + (obj.minute / 60);
+    }
+    const start24 = to24(state.start);
+    const end24 = to24(state.end);
+    let diff = end24 - start24;
+    if (diff < 0) diff += 24;
+    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
+    state.calculatedHours = diff;
+}
+
+function fillTimeOptions(sel, time) {
+    for (let h = 1; h <= 12; h++) {
+        ['AM', 'PM'].forEach(ampm => {
+            for (let m = 0; m < 60; m += 5) {
+                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
+                sel.add(new Option(val, val, false, selected));
+            }
+        });
+    }
+}
+
+function updateTimeFromSelect(id) {
+    const block = document.getElementById(`block-${id}`);
+    const s = document.getElementById(`start-${id}`).value.split(' ');
+    const e = document.getElementById(`end-${id}`).value.split(' ');
+    block.timeState.start = { ampm: s[0], hour: parseInt(s[1].split(':')[0]), minute: parseInt(s[1].split(':')[1]) };
+    block.timeState.end = { ampm: e[0], hour: parseInt(e[1].split(':')[0]), minute: parseInt(e[1].split(':')[1]) };
+    calculateBlockTime(id);
+}
 
 function to24(obj) {
 let h = obj.hour;
