@@ -110,8 +110,16 @@
         .btn-link.del { color: var(--danger); }
         .btn-link.edit { color: var(--accent); }
 
-        .expense-mini-list { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; max-height: 180px; overflow-y: auto; }
-        .expense-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 6px 0; border-bottom: 1px dashed #f1f5f9; }
+        .expense-mini-list { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; max-height: 250px; overflow-y: auto; }
+        .expense-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 8px 0; border-bottom: 1px dashed #f1f5f9; gap: 4px; }
+        .expense-item-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .expense-chk { width: 14px; height: 14px; cursor: pointer; }
+        .expense-item.paid-done { opacity: 0.6; background: #f8fafc; }
+        .expense-item.paid-done span { text-decoration: line-through; }
+        
+        .btn-action-icon { background: transparent; border: none; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-sub); }
+        .btn-action-icon.del { color: var(--danger); }
+        .btn-action-icon.edit { color: var(--accent); }
 
         .lightbox { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         .lightbox img { max-width: 90%; max-height: 80%; border-radius: 12px; }
@@ -155,9 +163,9 @@
         <div class="main-layout">
             
             <div class="panel">
-                <div class="panel-title">経費を登録</div>
+                <div class="panel-title" id="expense-panel-title">経費を登録</div>
                 <label class="group-label">対象のキャンパス</label>
-                <div class="pill-box">
+                <div class="pill-box" id="exp-campus-pills">
                     <button type="button" class="pill-btn active" onclick="setExpCampus('亀戸', this)">亀戸</button>
                     <button type="button" class="pill-btn" onclick="setExpCampus('下高井戸', this)">下高井戸</button>
                 </div>
@@ -178,7 +186,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn-submit" onclick="submitExpense()">経費を保存</button>
+                <button type="button" class="btn-submit" id="btn-save-expense" onclick="submitExpense()">経費を保存</button>
                 <div class="expense-mini-list" id="expense-mini-list"></div>
             </div>
 
@@ -259,6 +267,7 @@
         let expCampus = '亀戸', expBase64 = "";
         let shiftBlockCount = 0;
         let editingDateKey = null;
+        let editingExpenseIdx = null; // 経費編集用の管理インデックス
 
         let appData = JSON.parse(localStorage.getItem('v17_appMasterData')) || { shifts: {}, expenses: {} };
 
@@ -409,7 +418,6 @@
             const mHand = clock.querySelector('.hand-minute');
 
             function updateHands() {
-                // 改良：短針は中間に進まず、現在のインデックス数値を固定直指し
                 hHand.style.transform = `rotate(${state.hour * 30}deg)`;
                 mHand.style.transform = `rotate(${state.minute * 6}deg)`;
             }
@@ -431,7 +439,6 @@
                     let h = Math.round(angle / 30);
                     state.hour = (h === 0 || h === 12) ? 12 : h;
                 } else if (activeHand === 'minute') {
-                    // 改良：5分刻み（30度ステップ）にしっかりスナップ
                     let m = Math.round(angle / 30) * 5;
                     state.minute = (m === 60 || m === 0) ? 0 : m;
                 }
@@ -606,6 +613,7 @@
             btn.classList.add('active');
         }
 
+        // 改良：縮小を廃止し、WebPの品質0.90で超高画質化を担保
         function processExpenseImage(input) {
             const file = input.files[0]; if (!file) return;
             document.getElementById('exp-file-label').innerText = "選択済み";
@@ -613,10 +621,12 @@
             reader.onload = function (e) {
                 const img = new Image();
                 img.onload = function () {
-                    const canvas = document.createElement('canvas'); const width = 400; const scale = width / img.width;
-                    canvas.width = width; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    expBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d'); 
+                    ctx.drawImage(img, 0, 0);
+                    expBase64 = canvas.toDataURL('image/webp', 0.90);
                 };
                 img.src = e.target.result;
             };
@@ -629,7 +639,32 @@
             if (amt <= 0) { alert('金額を入力してください。'); return; }
 
             if (!appData.expenses[activeMonth]) appData.expenses[activeMonth] = [];
-            appData.expenses[activeMonth].push({ campus: expCampus, amount: amt, note: note, receipt: expBase64, date: new Date().toLocaleDateString('ja-JP', {month:'2-digit', day:'2-digit'}) });
+
+            if (editingExpenseIdx !== null) {
+                // 【編集モード時】既存のデータを上書き、完了状態は維持
+                const oldItem = appData.expenses[activeMonth][editingExpenseIdx];
+                appData.expenses[activeMonth][editingExpenseIdx] = {
+                    campus: expCampus,
+                    amount: amt,
+                    note: note,
+                    receipt: expBase64 || oldItem.receipt,
+                    date: oldItem.date,
+                    paid: oldItem.paid || false
+                };
+                editingExpenseIdx = null;
+                document.getElementById('expense-panel-title').innerText = "経費を登録";
+                document.getElementById('btn-save-expense').innerText = "経費を保存";
+            } else {
+                // 【通常時】新規作成
+                appData.expenses[activeMonth].push({ 
+                    campus: expCampus, 
+                    amount: amt, 
+                    note: note, 
+                    receipt: expBase64, 
+                    date: new Date().toLocaleDateString('ja-JP', {month:'2-digit', day:'2-digit'}),
+                    paid: false 
+                });
+            }
 
             saveMasterData(); renderDashboard();
             document.getElementById('exp-amount').value = '';
@@ -637,6 +672,56 @@
             document.getElementById('exp-file').value = '';
             document.getElementById('exp-file-label').innerText = "領収書イメージをインポート";
             expBase64 = "";
+        }
+
+        // 新機能：経費の個別編集モード起動
+        function editExpense(idx) {
+            const currentExpenses = getActiveExpenses();
+            const item = currentExpenses[idx];
+            if (!item) return;
+
+            editingExpenseIdx = idx;
+            document.getElementById('expense-panel-title').innerText = "【編集】経費を修正";
+            document.getElementById('btn-save-expense').innerText = "変更を確定";
+
+            document.getElementById('exp-amount').value = item.amount;
+            document.getElementById('exp-note').value = item.note;
+            expBase64 = ""; 
+
+            if (item.receipt) {
+                document.getElementById('exp-file-label').innerText = "以前の画像あり (変更時のみ選択)";
+            } else {
+                document.getElementById('exp-file-label').innerText = "領収書イメージをインポート";
+            }
+
+            const pills = document.getElementById('exp-campus-pills');
+            pills.querySelectorAll('.pill-btn').forEach(btn => {
+                if (btn.innerText === item.campus) {
+                    setExpCampus(item.campus, btn);
+                }
+            });
+        }
+
+        // 新機能：支払い完了のチェック状態を反転
+        function toggleExpensePaid(idx) {
+            if (!appData.expenses[activeMonth]) return;
+            appData.expenses[activeMonth][idx].paid = !appData.expenses[activeMonth][idx].paid;
+            saveMasterData();
+            renderDashboard();
+        }
+
+        function removeExpense(idx) {
+            if(confirm('この経費データを削除しますか？')) {
+                if (appData.expenses[activeMonth]) {
+                    appData.expenses[activeMonth].splice(idx, 1);
+                    if (editingExpenseIdx === parseInt(idx)) {
+                        editingExpenseIdx = null;
+                        document.getElementById('expense-panel-title').innerText = "経費を登録";
+                        document.getElementById('btn-save-expense').innerText = "経費を保存";
+                    }
+                    saveMasterData(); renderDashboard();
+                }
+            }
         }
 
         function openLightbox(src) { document.getElementById('lightbox').style.display = "flex"; document.getElementById('lightbox-img').src = src; }
@@ -710,12 +795,23 @@
                 if (e.campus === '下高井戸') takaidoUsed += e.amount;
             });
 
+            // 経費ミニリストの組み立て（チェックボックスと編集機能のUIを追加）
             [...currentExpenses].reverse().forEach((e, idx) => {
                 const origIdx = currentExpenses.length - 1 - idx;
                 const imgNode = e.receipt ? `<img src="${e.receipt}" class="thumb-receipt" onclick="openLightbox('${e.receipt}')">` : '<span>—</span>';
-                const item = `<div class="expense-item">
-                    <div><strong>[${e.campus}]</strong> ¥${e.amount.toLocaleString()}<br><span style="color:var(--text-sub); font-size:10px;">${e.date} - ${e.note}</span></div>
-                    <div style="display:flex; align-items:center; gap:6px;">${imgNode}<button class="btn-action-icon" onclick="removeExpense('${origIdx}')">削除</button></div>
+                const isPaidChecked = e.paid ? 'checked' : '';
+                const paidClass = e.paid ? 'paid-done' : '';
+                
+                const item = `<div class="expense-item ${paidClass}">
+                    <div class="expense-item-left">
+                        <input type="checkbox" class="expense-chk" ${isPaidChecked} onclick="toggleExpensePaid(${origIdx})">
+                        <span><strong>[${e.campus}]</strong> ¥${e.amount.toLocaleString()}<br><span style="color:var(--text-sub); font-size:10px;">${e.date} - ${e.note}</span></span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${imgNode}
+                        <button class="btn-action-icon edit" onclick="editExpense(${origIdx})">編集</button>
+                        <button class="btn-action-icon del" onclick="removeExpense('${origIdx}')">削除</button>
+                    </div>
                 </div>`;
                 eMinilist.insertAdjacentHTML('beforeend', item);
             });
