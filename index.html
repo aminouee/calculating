@@ -1,1032 +1,1670 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>マイページ / 給与・経費管理</title>
 
-<link rel="apple-touch-icon" href="money-transfer.jpg">
-<link rel="icon" href="money-transfer.jpg">
+  <style>
+    :root {
+      --bg-main: #f1f5f9;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --accent-bg: #f8fafc;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
 
-<title>マイページ / 給与・経費管理</title>
-<style>
-:root {
---bg-main: #f1f5f9;
---surface: #ffffff;
---border: #e2e8f0;
---text-main: #0f172a;
---text-sub: #64748b;
---primary: #1e3a8a;
---primary-light: #3b82f6;
---accent-bg: #f8fafc;
---success: #10b981;
---warning: #f59e0b;
---danger: #ef4444;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-main); color: var(--text-main); -webkit-font-smoothing: antialiased; padding: 12px; padding-bottom: 40px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding: 12px;
+      padding-bottom: 44px;
+    }
 
-.container { max-width: 480px; margin: 0 auto; width: 100%; }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      width: 100%;
+    }
 
-.header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; margin-top: 4px; }
-.title-route { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-.title-route span { color: var(--text-sub); font-weight: 500; font-size: 14px; }
+    .header-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 16px;
+    }
 
-.month-selector-zone { display: flex; align-items: center; background: var(--surface); padding: 4px 8px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-.month-select { padding: 4px 8px; border-radius: 6px; border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--text-main); outline: none; cursor: pointer; }
+    .title-route {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
 
-/* モバイル最適化ダッシュボード */
-.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); padding: 14px 12px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; }
-.stat-card.full-width { grid-column: span 2; }
-.stat-label { font-size: 11px; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
-.stat-value { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 2px; }
-.stat-subtext { font-size: 10px; color: var(--text-sub); }
+    .title-route span {
+      color: var(--text-sub);
+      font-weight: 500;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
-.progress-container { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: 6px; overflow: hidden; }
-.progress-bar { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.3s ease; }
-.progress-bar.warning { background: var(--warning); }
-.progress-bar.danger { background: var(--danger); }
+    .month-selector-zone {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      min-width: 142px;
+    }
 
-/* モバイル縦積みレイアウト */
-.main-layout { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); width: 100%; }
-.panel-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .month-select {
+      width: 100%;
+      padding: 4px 2px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
 
-/* モバイルUIパーツ */
-.group-label { font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; display: block; }
-.pill-box { display: flex; gap: 4px; background: #e2e8f0; padding: 3px; border-radius: 10px; margin-bottom: 12px; }
-.pill-btn { flex: 1; border: none; padding: 8px 4px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; background: transparent; color: var(--text-sub); text-align: center; min-height: 34px; transition: all 0.2s; }
-.pill-btn.active { background: var(--surface); color: var(--primary); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
 
-.form-stack { display: flex; flex-direction: column; gap: 12px; }
-        .field { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-        .field label { font-size: 11px; font-weight: 700; color: var(--text-sub); }
-        .field { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 4px; 
-            width: 100%; 
-            overflow: hidden;
-        }
-.field input { 
-padding: 10px 12px; 
-border: 1px solid var(--border); 
-@@ -74,816 +79,821 @@
-outline: none; 
-transition: border 0.2s; 
-box-sizing: border-box;
-            
-display: block;
-            max-width: 100%;
-            -webkit-appearance: none;
-}
-        .field label { font-size: 11px; font-weight: 700; color: var(--text-sub); }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 14px 12px;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 84px;
+    }
 
-.field input:focus { border-color: var(--primary-light); background: var(--surface); }
+    .stat-card.full-width {
+      grid-column: span 2;
+      min-height: 78px;
+    }
 
-.hidden { display: none !important; }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
 
-/* モダン・ファイルアップローダー UI */
-.upload-container { width: 100%; position: relative; }
-.modern-upload-zone { border: 2px dashed #cbd5e1; background: var(--accent-bg); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.modern-upload-zone:active, .modern-upload-zone.dragover { border-color: var(--primary-light); background: #eff6ff; }
-.upload-icon { width: 28px; height: 28px; fill: none; stroke: var(--text-sub); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.modern-upload-zone.has-file .upload-icon { stroke: var(--success); }
-.upload-text-main { font-size: 12px; font-weight: 700; color: var(--text-main); }
-.upload-text-sub { font-size: 10px; color: var(--text-sub); }
-#exp-file { display: none; }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 2px;
+    }
 
-/* シフトセッション */
-.shift-block-input { background: var(--accent-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-.shift-block-title { font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .stat-subtext {
+      font-size: 10px;
+      color: var(--text-sub);
+    }
 
-.btn-submit { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; width: 100%; min-height: 44px; margin-top: 6px; box-shadow: 0 2px 4px rgba(30,58,138,0.15); }
-.btn-submit:active { background: #172554; }
-.btn-remove-block { background: transparent; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; padding: 4px; }
+    .progress-container {
+      width: 100%;
+      height: 5px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
 
-/* スマートフォン向け最適化リスト＆テーブル */
-.table-container { width: 100%; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-.mobile-list { display: flex; flex-direction: column; }
-.mobile-list-item { background: var(--surface); padding: 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-.mobile-list-item:last-child { border-bottom: none; }
-.item-row-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.item-row-mid { background: var(--accent-bg); padding: 8px; border-radius: 8px; font-size: 12px; }
-.item-row-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 12px; border-top: 1px dashed var(--border); padding-top: 6px; }
+    .progress-bar {
+      height: 100%;
+      background: var(--primary-light);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
 
-.badge-job { display: inline-flex; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 2px; }
-.badge-保育 { background: #eff6ff; color: #2563eb; }
-.badge-絵画造形 { background: #fffbeb; color: #d97706; }
-.badge-インターン { background: #f0fdf4; color: #16a34a; }
-.badge-その他 { background: #f1f5f9; color: #475569; }
+    .progress-bar.warning { background: var(--warning); }
+    .progress-bar.danger { background: var(--danger); }
 
-.campus-prefix { font-weight: 800; color: var(--primary); font-size: 13px; margin-right: 4px; }
-.thumb-receipt { width: 42px; height: 42px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
 
-.action-links { display: flex; gap: 12px; }
-.btn-link { background: transparent; border: none; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-sub); padding: 4px; }
-.btn-link.del { color: var(--danger); }
-.btn-link.edit { color: var(--primary-light); }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      width: 100%;
+    }
 
-.expense-mini-list { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
-.expense-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); gap: 6px; }
-.expense-item-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-.expense-chk { width: 18px; height: 18px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border); }
-.expense-item.paid-done { opacity: 0.5; background: var(--accent-bg); }
-.expense-item.paid-done span { text-decoration: line-through; }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
 
-.btn-action-icon { background: transparent; border: none; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-sub); padding: 4px; }
-.btn-action-icon.del { color: var(--danger); }
-.btn-action-icon.edit { color: var(--primary-light); }
+    .group-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      display: block;
+    }
 
-.lightbox { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.9); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-.lightbox img { max-width: 95%; max-height: 85%; border-radius: 12px; }
-</style>
+    .pill-box {
+      display: flex;
+      gap: 4px;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      border: none;
+      padding: 8px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      background: transparent;
+      color: var(--text-sub);
+      text-align: center;
+      min-height: 34px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .pill-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      font-weight: 800;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .form-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--accent-bg);
+      font-size: 16px;
+      outline: none;
+      transition: border 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field textarea {
+      min-height: 74px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--primary-light);
+      background: var(--surface);
+    }
+
+    .hidden { display: none !important; }
+
+    .shift-block-input {
+      background: var(--accent-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .shift-block-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .time-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      outline: none;
+      text-align: center;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .time-input:focus {
+      border-color: var(--primary-light);
+    }
+
+    .time-help {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .time-display {
+      margin-top: 8px;
+      font-weight: 800;
+      color: var(--primary-light);
+      font-size: 13px;
+    }
+
+    .error-text {
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      width: 100%;
+      min-height: 44px;
+      margin-top: 6px;
+      box-shadow: 0 2px 4px rgba(30,58,138,0.15);
+    }
+
+    .btn-submit:active { background: #172554; }
+    .btn-submit.secondary { background: #475569; }
+    .btn-submit.danger { background: var(--danger); }
+
+    .btn-remove-block {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .btn-small {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-sub);
+      padding: 6px 8px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-small.primary {
+      color: var(--primary);
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    .btn-small.danger {
+      color: var(--danger);
+      border-color: #fecaca;
+      background: #fff1f2;
+    }
+
+    .upload-container { width: 100%; position: relative; }
+
+    .modern-upload-zone {
+      border: 2px dashed #cbd5e1;
+      background: var(--accent-bg);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modern-upload-zone:active,
+    .modern-upload-zone.dragover {
+      border-color: var(--primary-light);
+      background: #eff6ff;
+    }
+
+    .modern-upload-zone.has-file {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .upload-icon {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: var(--text-sub);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .modern-upload-zone.has-file .upload-icon { stroke: var(--success); }
+    .upload-text-main { font-size: 12px; font-weight: 700; color: var(--text-main); }
+    .upload-text-sub { font-size: 10px; color: var(--text-sub); }
+    #exp-file { display: none; }
+
+    .mobile-list {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .empty-state {
+      padding: 18px;
+      font-size: 12px;
+      color: var(--text-sub);
+      text-align: center;
+      background: var(--accent-bg);
+    }
+
+    .mobile-list-item {
+      background: var(--surface);
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-list-item:last-child { border-bottom: none; }
+
+    .item-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .item-row-mid {
+      background: var(--accent-bg);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .item-row-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      border-top: 1px dashed var(--border);
+      padding-top: 6px;
+    }
+
+    .badge-job {
+      display: inline-flex;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin: 2px 4px 2px 0;
+      vertical-align: middle;
+    }
+
+    .badge-保育 { background: #eff6ff; color: #2563eb; }
+    .badge-絵画造形 { background: #fffbeb; color: #d97706; }
+    .badge-インターン { background: #f0fdf4; color: #16a34a; }
+    .badge-その他 { background: #f1f5f9; color: #475569; }
+
+    .campus-prefix {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 13px;
+      margin-right: 4px;
+    }
+
+    .action-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-link {
+      background: transparent;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-sub);
+      padding: 4px;
+    }
+
+    .btn-link.del { color: var(--danger); }
+    .btn-link.edit { color: var(--primary-light); }
+
+    .expense-mini-list {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      gap: 8px;
+    }
+
+    .expense-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .expense-item-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .expense-item-text span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .expense-chk {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+
+    .expense-item.paid-done {
+      opacity: 0.55;
+      background: var(--accent-bg);
+    }
+
+    .expense-item.paid-done .expense-item-text span {
+      text-decoration: line-through;
+    }
+
+    .thumb-receipt {
+      width: 42px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .btn-action-icon {
+      background: transparent;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-sub);
+      padding: 4px;
+    }
+
+    .btn-action-icon.del { color: var(--danger); }
+    .btn-action-icon.edit { color: var(--primary-light); }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15,23,42,0.9);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 85%;
+      border-radius: 12px;
+      background: white;
+    }
+
+    @media (max-width: 380px) {
+      body { padding: 10px; }
+      .title-route { font-size: 16px; }
+      .title-route span { font-size: 12px; }
+      .pill-btn { font-size: 11px; }
+      .stat-value { font-size: 16px; }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="container">
+    <div class="header-area">
+      <div class="title-route">マイページ <span>/ 給与・経費管理</span></div>
+      <div class="month-selector-zone">
+        <select id="global-month" class="month-select" onchange="switchMonth()"></select>
+      </div>
+    </div>
 
-<div class="container">
-<div class="header-area">
-<div class="title-route">マイページ <span>/ 給与・経費管理</span></div>
-<div class="month-selector-zone">
-<select id="global-month" class="month-select" onchange="switchMonth()"></select>
-</div>
-</div>
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-label" id="salary-card-title">予想給与</div>
+        <div class="stat-value" id="dash-salary">¥0</div>
+        <div class="stat-subtext">手当・交通費含</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">総労働時間</div>
+        <div class="stat-value" id="dash-hours">0.0h</div>
+        <div class="stat-subtext">確定勤怠ベース</div>
+      </div>
+      <div class="stat-card full-width">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:10px;">
+          <div>
+            <div class="stat-label" style="margin:0;">亀戸 経費残高</div>
+            <div class="stat-value" id="dash-kameido-rem" style="font-size:16px;">¥6,000</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="stat-subtext" id="dash-kameido-used">利用: ¥0 / ¥6,000</div>
+          </div>
+        </div>
+        <div class="progress-container"><div class="progress-bar" id="pb-kameido"></div></div>
+      </div>
+      <div class="stat-card full-width">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:10px;">
+          <div>
+            <div class="stat-label" style="margin:0;">下高井戸 経費残高</div>
+            <div class="stat-value" id="dash-takaido-rem" style="font-size:16px;">¥2,000</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="stat-subtext" id="dash-takaido-used">利用: ¥0 / ¥2,000</div>
+          </div>
+        </div>
+        <div class="progress-container"><div class="progress-bar" id="pb-takaido"></div></div>
+      </div>
+    </div>
 
-<div class="dashboard-grid">
-<div class="stat-card">
-<div class="stat-label" id="salary-card-title">予想給与</div>
-<div class="stat-value" id="dash-salary">¥0</div>
-<div class="stat-subtext">手当・交通費含</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">総労働時間</div>
-<div class="stat-value" id="dash-hours">0.0h</div>
-<div class="stat-subtext">確定勤怠ベース</div>
-</div>
-<div class="stat-card full-width">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-<div>
-<div class="stat-label" style="margin:0;">亀戸 経費残高</div>
-<div class="stat-value" id="dash-kameido-rem" style="font-size:16px;">¥6,000</div>
-</div>
-<div style="text-align:right;">
-<div class="stat-subtext" id="dash-kameido-used">利用: ¥0 / ¥6,000</div>
-</div>
-</div>
-<div class="progress-container"><div class="progress-bar" id="pb-kameido"></div></div>
-</div>
-<div class="stat-card full-width">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-<div>
-<div class="stat-label" style="margin:0;">下高井戸 経費残高</div>
-<div class="stat-value" id="dash-takaido-rem" style="font-size:16px;">¥2,000</div>
-</div>
-<div style="text-align:right;">
-<div class="stat-subtext" id="dash-takaido-used">利用: ¥0 / ¥2,000</div>
-</div>
-</div>
-<div class="progress-container"><div class="progress-bar" id="pb-takaido"></div></div>
-</div>
-</div>
+    <div class="main-layout">
+      <div class="panel">
+        <div class="panel-title" id="form-panel-title">
+          <span>シフトを登録</span>
+          <button type="button" class="btn-small" onclick="resetShiftForm()">入力をリセット</button>
+        </div>
 
-<div class="main-layout">
+        <div class="form-stack">
+          <div class="field">
+            <label>勤務日</label>
+            <input type="date" id="shift-date" />
+          </div>
 
-<!-- 【配置変更】シフト登録を上に配置 -->
-<div class="panel">
-<div class="panel-title" id="form-panel-title">本日のシフトを登録</div>
-
-<div class="form-stack">
-<div class="field">
-<label>勤務日</label>
-<input type="date" id="shift-date">
-</div>
-
-<label class="group-label">勤務校舎</label>
-<div class="pill-box">
-<button type="button" class="pill-btn active" onclick="setGlobalCampus('亀戸', this)">亀戸</button>
-<button type="button" class="pill-btn" onclick="setGlobalCampus('下高井戸', this)">下高井戸</button>
-<button type="button" class="pill-btn" onclick="setGlobalCampus('その他', this)">その他</button>
-</div>
-<div class="field hidden" id="custom-campus-wrapper">
-<label>校舎名を入力（自由記述）</label>
-<input type="text" id="custom-campus-name" placeholder="例: 渋谷校">
-</div>
-
-<div class="field">
-<label>本日の交通費合計 ¥</label>
-<input type="number" id="global-transit" value="1035" inputmode="numeric">
-</div>
-
-<div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-<label class="group-label" style="margin:0;">勤務セッション</label>
-<button type="button" class="pill-btn" style="max-width:90px; min-height:28px; font-size:11px;" onclick="addShiftBlock()">＋ 追加</button>
-</div>
-
-<div id="shift-blocks-container"></div>
-
-<div class="field">
-<label>その他手当 ¥</label>
-<input type="number" id="custom-allowance" value="0" inputmode="numeric">
-</div>
-<div class="field">
-<label>全体の備考・メモ</label>
-<input type="text" id="shift-memo" placeholder="例: イベント参加">
-</div>
-</div>
-<button type="button" class="btn-submit" id="btn-save-shift" onclick="submitAllShifts()">シフトを一括保存</button>
-</div>
-
-<!-- 【配置変更】経費登録を下に配置 -->
-<div class="panel">
-<div class="panel-title" id="expense-panel-title">経費を登録</div>
-<label class="group-label">対象のキャンパス</label>
-<div class="pill-box" id="exp-campus-pills">
-<button type="button" class="pill-btn active" onclick="setExpCampus('亀戸', this)">亀戸</button>
-<button type="button" class="pill-btn" onclick="setExpCampus('下高井戸', this)">下高井戸</button>
-</div>
-<div class="form-stack">
-<div class="field">
-<label>購入金額 ¥</label>
-<input type="number" id="exp-amount" placeholder="¥1,280" inputmode="numeric">
-</div>
-<div class="field">
-<label>品名・用途</label>
-<input type="text" id="exp-note" placeholder="画用紙、絵の具など">
-</div>
-<div class="field">
-<label>レシート写真</label>
-<div class="upload-container" onclick="document.getElementById('exp-file').click()">
-<div class="modern-upload-zone" id="upload-zone">
-<svg class="upload-icon" viewBox="0 0 24 24">
-<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-</svg>
-<span class="upload-text-main" id="exp-file-label">タップして領収書をインポート</span>
-<span class="upload-text-sub">高画質・WebP形式で保管されます</span>
-</div>
-<input type="file" id="exp-file" accept="image/*" onchange="processExpenseImage(this)">
-</div>
-</div>
-</div>
-<button type="button" class="btn-submit" id="btn-save-expense" onclick="submitExpense()">経費を保存</button>
-<div class="expense-mini-list" id="expense-mini-list"></div>
-</div>
-
-<div class="panel">
-<div class="panel-title">シフト履歴一覧</div>
-<div id="shift-mobile-list" class="mobile-list"></div>
-</div>
-
-</div>
-</div>
-
-<div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src=""></div>
-
-<script>
-// 日付の初期状態判定ロジック
-
-let globalCampus = '亀戸';
-let expCampus = '亀戸', expBase64 = "";
-let shiftBlockCount = 0;
-let editingDateKey = null;
-let editingExpenseIdx = null;
-
-// 初期データ（提示された6月・7月のデータ）を定義
-const defaultMasterData = {"shifts":{"2026-07":[{"date":"2026-06-04","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-06-04","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-06-04","campus":"亀戸","job":"保育","wage":1400,"hours":0.5,"pay":700,"transit":1035,"allowance":0,"timeSpan":"06:00PM-06:30PM","memo":""},{"date":"2026-06-05","campus":"下高井戸","job":"保育","wage":1400,"hours":2.5,"pay":3500,"transit":0,"allowance":0,"timeSpan":"01:30PM-04:00PM","memo":""},{"date":"2026-06-05","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-06-11","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-06-11","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-06-11","campus":"亀戸","job":"保育","wage":1400,"hours":0.5,"pay":700,"transit":1035,"allowance":0,"timeSpan":"06:00PM-06:30PM","memo":""},{"date":"2026-06-18","campus":"下高井戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-06-18","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-06-18","campus":"下高井戸","job":"保育","wage":1400,"hours":0.5,"pay":700,"transit":1035,"allowance":0,"timeSpan":"06:00PM-06:30PM","memo":""},{"date":"2026-06-19","campus":"下高井戸","job":"保育","wage":1400,"hours":1.5,"pay":2100,"transit":0,"allowance":0,"timeSpan":"02:30PM-04:00PM","memo":""},{"date":"2026-06-19","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-06-25","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-06-25","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-06-25","campus":"亀戸","job":"保育","wage":1400,"hours":0.5,"pay":700,"transit":1035,"allowance":0,"timeSpan":"06:00PM-06:30PM","memo":""},{"date":"2026-06-26","campus":"下高井戸","job":"保育","wage":1400,"hours":1.5,"pay":2100,"transit":280,"allowance":0,"timeSpan":"02:30PM-04:00PM","memo":""},{"date":"2026-06-26","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":280,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-06-12","campus":"下高井戸","job":"保育","wage":1400,"hours":1.5,"pay":2100,"transit":280,"allowance":0,"timeSpan":"02:30PM-04:00PM","memo":""},{"date":"2026-06-12","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":280,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-06-15","campus":"自宅","job":"インターン","wage":1400,"hours":3,"pay":4200,"transit":0,"allowance":0,"timeSpan":"02:00PM-05:00PM","memo":""}],"2026-06":[{"date":"2026-04-25","campus":"自宅","job":"その他","wage":0,"hours":1,"pay":0,"transit":0,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-07","campus":"亀戸","job":"保育","wage":1400,"hours":3,"pay":4200,"transit":1035,"allowance":0,"timeSpan":"01:00PM-04:00PM","memo":""},{"date":"2026-05-07","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-05-07","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"06:00PM-07:00PM","memo":""},{"date":"2026-05-14","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-14","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-05-14","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"06:00PM-07:00PM","memo":""},{"date":"2026-05-21","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-21","campus":"亀戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-05-21","campus":"亀戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"06:00PM-07:00PM","memo":""},{"date":"2026-05-28","campus":"下高井戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-28","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":2,"pay":3200,"transit":1035,"allowance":0,"timeSpan":"04:00PM-06:00PM","memo":""},{"date":"2026-05-28","campus":"下高井戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":1035,"allowance":0,"timeSpan":"06:00PM-07:00PM","memo":""},{"date":"2026-05-08","campus":"下高井戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":0,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-08","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-05-15","campus":"下高井戸","job":"保育","wage":1400,"hours":1,"pay":1400,"transit":0,"allowance":0,"timeSpan":"03:00PM-04:00PM","memo":""},{"date":"2026-05-15","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-05-22","campus":"下高井戸","job":"保育","wage":1400,"hours":1.5,"pay":2100,"transit":0,"allowance":0,"timeSpan":"02:30PM-04:00PM","memo":""},{"date":"2026-05-22","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-05-29","campus":"下高井戸","job":"保育","wage":1400,"hours":1.5,"pay":2100,"transit":0,"allowance":0,"timeSpan":"02:30PM-04:00PM","memo":""},{"date":"2026-05-29","campus":"下高井戸","job":"絵画造形","wage":1600,"hours":1,"pay":1600,"transit":0,"allowance":0,"timeSpan":"04:00PM-05:00PM","memo":""},{"date":"2026-05-01","campus":"用賀","job":"保育","wage":1400,"hours":2,"pay":2800,"transit":830,"allowance":0,"timeSpan":"02:00PM-04:00PM","memo":""}]},"expenses":{}};
-
-// 保存されたデータがあれば読み込み、なければ初期データを使用する
-let savedData = localStorage.getItem('v17_appMasterData');
-let appData;
-
-if (savedData) {
-    appData = JSON.parse(savedData);
-} else {
-    appData = defaultMasterData;
-    localStorage.setItem('v17_appMasterData', JSON.stringify(appData));
-}
-
-const monthSelect = document.getElementById('global-month');
-for (let i = 0; i < 11; i++) {
-const d = new Date(2026, 5 + i, 1);
-const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-const isCurrent = mKey === `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-monthSelect.insertAdjacentHTML('beforeend', `<option value="${mKey}" ${isCurrent ? 'selected' : ''}>${d.getFullYear()}年${d.getMonth() + 1}月 支給分</option>`);
-}
-let activeMonth = monthSelect.value;
-
-window.onload = function() {
-resetShiftForm();
-renderDashboard();
-};
-
-function setGlobalCampus(campus, btn) {
-globalCampus = campus;
-btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-
-const customWrapper = document.getElementById('custom-campus-wrapper');
-if (campus === 'その他') customWrapper.classList.remove('hidden');
-else customWrapper.classList.add('hidden');
-
-const transitInput = document.getElementById('global-transit');
-if (campus === '亀戸') transitInput.value = 1035;
-else transitInput.value = 0;
-}
-
-function resetShiftForm() {
-editingDateKey = null;
-document.getElementById('form-panel-title').innerText = "本日のシフトを登録";
-document.getElementById('btn-save-shift').innerText = "本日のシフトを一括保存";
-document.getElementById('shift-date').disabled = false;
-document.getElementById('shift-blocks-container').innerHTML = '';
-document.getElementById('custom-allowance').value = '0';
-document.getElementById('shift-memo').value = '';
-
-// 保存済みの最終利用日付があればそれをセット、無ければ今日の日付
-let savedDate = localStorage.getItem('v17_lastUsedDate');
-if (savedDate) {
-document.getElementById('shift-date').value = savedDate;
-} else {
-document.getElementById('shift-date').valueAsDate = new Date();
-}
-
-addShiftBlock('保育', { ampm: 'PM', hour: 3, minute: 0 }, { ampm: 'PM', hour: 4, minute: 0 });
-addShiftBlock('絵画造形', { ampm: 'PM', hour: 4, minute: 0 }, { ampm: 'PM', hour: 6, minute: 0 });
-}
-
-// --- シフト登録用関数 ---
-function addShiftBlock(defaultJob = '保育', startObj = {ampm:'PM', hour:3, minute:0}, endObj = {ampm:'PM', hour:6, minute:0}) {
-    shiftBlockCount++;
-    const id = shiftBlockCount;
-
-    const blockHtml = `
-        <div class="shift-block-input" id="block-${id}">
-            <div class="shift-block-title">
-                <span>セッション</span>
-                <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
+          <div>
+            <label class="group-label">勤務校舎</label>
+            <div class="pill-box" id="campus-pills">
+              <button type="button" class="pill-btn active" onclick="setGlobalCampus('亀戸', this)">亀戸</button>
+              <button type="button" class="pill-btn" onclick="setGlobalCampus('下高井戸', this)">下高井戸</button>
+              <button type="button" class="pill-btn" onclick="setGlobalCampus('その他', this)">その他</button>
             </div>
-            <div class="pill-box job-pills">
-                <button type="button" class="pill-btn ${defaultJob==='保育'?'active':''}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
-                <button type="button" class="pill-btn ${defaultJob==='絵画造形'?'active':''}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
+          </div>
+
+          <div class="field hidden" id="custom-campus-wrapper">
+            <label>校舎名を入力（自由記述）</label>
+            <input type="text" id="custom-campus-name" placeholder="例: 自宅、用賀、渋谷校" />
+          </div>
+
+          <div class="field">
+            <label>本日の交通費合計 ¥</label>
+            <input type="number" id="global-transit" value="1035" min="0" inputmode="numeric" />
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; gap:10px;">
+            <label class="group-label" style="margin:0;">勤務セッション</label>
+            <button type="button" class="btn-small primary" onclick="addShiftBlock()">＋ 追加</button>
+          </div>
+
+          <div id="shift-blocks-container"></div>
+
+          <div class="field">
+            <label>その他手当 ¥</label>
+            <input type="number" id="custom-allowance" value="0" min="0" inputmode="numeric" />
+          </div>
+
+          <div class="field">
+            <label>全体の備考・メモ</label>
+            <input type="text" id="shift-memo" placeholder="例: イベント参加" />
+          </div>
+        </div>
+
+        <button type="button" class="btn-submit" id="btn-save-shift" onclick="submitAllShifts()">シフトを一括保存</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title" id="expense-panel-title">
+          <span>経費を登録</span>
+          <button type="button" class="btn-small" onclick="resetExpenseForm()">入力をリセット</button>
+        </div>
+
+        <label class="group-label">対象のキャンパス</label>
+        <div class="pill-box" id="exp-campus-pills">
+          <button type="button" class="pill-btn active" onclick="setExpCampus('亀戸', this)">亀戸</button>
+          <button type="button" class="pill-btn" onclick="setExpCampus('下高井戸', this)">下高井戸</button>
+        </div>
+
+        <div class="form-stack">
+          <div class="field">
+            <label>購入金額 ¥</label>
+            <input type="number" id="exp-amount" placeholder="1280" min="0" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label>品名・用途</label>
+            <input type="text" id="exp-note" placeholder="画用紙、絵の具など" />
+          </div>
+          <div class="field">
+            <label>レシート写真</label>
+            <div class="upload-container" onclick="document.getElementById('exp-file').click()">
+              <div class="modern-upload-zone" id="upload-zone">
+                <svg class="upload-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                </svg>
+                <span class="upload-text-main" id="exp-file-label">タップして領収書をインポート</span>
+                <span class="upload-text-sub">画像はブラウザ内に保存されます</span>
+              </div>
+              <input type="file" id="exp-file" accept="image/*" onchange="processExpenseImage(this)" />
             </div>
-            <div style="display:flex; gap:5px;">
-                <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})"></select>
-                <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})"></select>
-            </div>
-            <div id="display-${id}" style="margin-top:8px; font-weight:800; color:var(--primary-light);">0.00h</div>
-        </div>`;
+          </div>
+        </div>
 
-    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
-    
-    // 状態を初期化
-    const block = document.getElementById(`block-${id}`);
-    block.timeState = { 
-        job: defaultJob, 
-        wage: defaultJob === '絵画造形' ? 1600 : 1400,
-        start: startObj,
-        end: endObj
+        <button type="button" class="btn-submit" id="btn-save-expense" onclick="submitExpense()">経費を保存</button>
+        <div class="expense-mini-list" id="expense-mini-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <span>シフト履歴一覧</span>
+          <button type="button" class="btn-small danger" onclick="resetToInitialData()">初期データに戻す</button>
+        </div>
+        <div id="shift-mobile-list" class="mobile-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="レシート画像" />
+  </div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "v20_payroll_expense_manager_manual_24h";
+
+    const BUDGETS = {
+      "亀戸": 6000,
+      "下高井戸": 2000
     };
 
-    fillTimeOptions(document.getElementById(`start-${id}`), startObj);
-    fillTimeOptions(document.getElementById(`end-${id}`), endObj);
-    calculateBlockTime(id);
-}
-
-// --- 時刻選択肢の生成 ---
-function fillTimeOptions(sel, time) {
-    for (let h = 1; h <= 12; h++) {
-        ['AM', 'PM'].forEach(ampm => {
-            for (let m = 0; m < 60; m += 5) {
-                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
-                sel.add(new Option(val, val, false, selected));
-            }
-        });
-    }
-}
-
-
-
-
-// --- 職種切り替え ---
-function setBlockJob(id, job, wage, btn) {
-    const block = document.getElementById(`block-${id}`);
-    block.timeState.job = job;
-    block.timeState.wage = wage;
-    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-// --- ブロック削除 ---
-function removeShiftBlock(id) {
-    const block = document.getElementById(`block-${id}`);
-    if (block) block.remove();
-}
-        
-// --- シフト登録用関数 ---
-// --- シフト登録用関数 (最新版に置換) ---
-function addShiftBlock(defaultJob = '保育', startDefault = {ampm:'PM', hour:3, minute:0}, endDefault = {ampm:'PM', hour:6, minute:0}) {
-    shiftBlockCount++;
-    const id = shiftBlockCount;
-
-    const blockHtml = `
-        <div class="shift-block-input" id="block-${id}" data-block-id="${id}">
-            <div class="shift-block-title">
-                <span>セッション</span>
-                <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
-            </div>
-            <label class="group-label">職種</label>
-            <div class="pill-box job-pills">
-                <button type="button" class="pill-btn ${defaultJob==='保育'?'active':''}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
-                <button type="button" class="pill-btn ${defaultJob==='絵画造形'?'active':''}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
-                <button type="button" class="pill-btn ${defaultJob==='インターン'?'active':''}" onclick="setBlockJob(${id}, 'インターン', 1400, this)">インターン</button>
-                <button type="button" class="pill-btn ${defaultJob==='その他'?'active':''}" onclick="setBlockJob(${id}, 'その他', 0, this)">その他</button>
-            </div>
-            <div class="field">
-                <label>時刻選択</label>
-                <div style="display:flex; gap:5px;">
-                    <select class="time-select" id="start-${id}" onchange="updateTimeFromSelect(${id})" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:8px;"></select>
-                    <select class="time-select" id="end-${id}" onchange="updateTimeFromSelect(${id})" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:8px;"></select>
-                </div>
-            </div>
-            <div id="display-${id}" style="margin-top:8px; font-weight:800; color:var(--primary-light);">0.00h</div>
-        </div>`;
-
-    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
-    
-    document.getElementById(`block-${id}`).timeState = { 
-        job: defaultJob, 
-        wage: defaultJob==='絵画造形'?1600:1400 
+    const WAGES = {
+      "保育": 1400,
+      "絵画造形": 1600,
+      "インターン": 1400,
+      "その他": 0
     };
 
-    fillTimeOptions(document.getElementById(`start-${id}`), startDefault);
-    fillTimeOptions(document.getElementById(`end-${id}`), endDefault);
-    updateTimeFromSelect(id);
-}
-
-// --- 時刻オプション生成関数 (新規追加) ---
-function fillTimeOptions(sel, time) {
-    for (let h = 1; h <= 12; h++) {
-        ['AM', 'PM'].forEach(ampm => {
-            for (let m = 0; m < 60; m += 5) {
-                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
-                sel.add(new Option(val, val, false, selected));
-            }
-        });
-    }
-}
-
-// --- 時刻計算・表示用関数 (新規追加) ---
-function updateTimeFromSelect(id) {
-    const block = document.getElementById(`block-${id}`);
-    if(!block) return;
-    const s = document.getElementById(`start-${id}`).value.split(' ');
-    const e = document.getElementById(`end-${id}`).value.split(' ');
-    const to24 = (ampm, t) => { 
-        let [h, m] = t.split(':').map(Number);
-        if (ampm === 'PM' && h !== 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        return h + (m / 60);
-    };
-    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
-    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
-    block.timeState.calculatedHours = diff;
-}
-
-// --- 職種ボタン制御 (新規追加) ---
-function setBlockJob(id, job, wage, btn) {
-    const block = document.getElementById(`block-${id}`);
-    block.timeState.job = job;
-    block.timeState.wage = wage;
-    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-// --- 時刻オプション生成 ---
-function fillTimeOptions(sel, time) {
-    sel.innerHTML = '';
-    for (let h = 1; h <= 12; h++) {
-        ['AM', 'PM'].forEach(ampm => {
-            for (let m = 0; m < 60; m += 5) {
-                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
-                sel.add(new Option(val, val, false, selected));
-            }
-        });
-    }
-}
-
-// --- 時刻計算 ---
-function updateTimeFromSelect(id) {
-    const block = document.getElementById(`block-${id}`);
-    if(!block) return;
-    const s = document.getElementById(`start-${id}`).value.split(' ');
-    const e = document.getElementById(`end-${id}`).value.split(' ');
-    const to24 = (ampm, t) => { 
-        let [h, m] = t.split(':').map(Number);
-        if (ampm === 'PM' && h !== 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        return h + (m / 60);
-    };
-    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
-    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
-    block.timeState.calculatedHours = diff;
-}
-
-// --- ブロック削除 ---
-function removeShiftBlock(id) {
-    const block = document.getElementById(`block-${id}`);
-    if (block) block.remove();
-}
-
-    document.getElementById('shift-blocks-container').insertAdjacentHTML('beforeend', blockHtml);
-    
-    // ここでプルダウンの中身を作る
-    const startSel = document.getElementById(`start-${id}`);
-    const endSel = document.getElementById(`end-${id}`);
-    fillTimeOptions(startSel, startDefault);
-    fillTimeOptions(endSel, endDefault);
-    
-    // 状態を保持するためのオブジェクト作成
-    document.getElementById(`block-${id}`).timeState = { job: defaultJob, wage: 1400 };
-    updateTimeFromSelect(id);
-}
-                
-    // 初期状態を保持
-    const blockEl = document.getElementById(`block-${id}`);
-    blockEl.timeState = { 
-        job: defaultJob, 
-        wage: defaultJob==='絵画造形'?1600:1400, 
-        start: startDefault, 
-        end: endDefault 
+    const INITIAL_DATA = {
+      shifts: {
+        "2026-07": [
+          { date: "2026-06-04", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-06-04", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-06-04", campus: "亀戸", job: "保育", wage: 1400, hours: 0.5, pay: 700, transit: 1035, allowance: 0, timeSpan: "06:00PM-06:30PM", memo: "" },
+          { date: "2026-06-05", campus: "下高井戸", job: "保育", wage: 1400, hours: 2.5, pay: 3500, transit: 0, allowance: 0, timeSpan: "01:30PM-04:00PM", memo: "" },
+          { date: "2026-06-05", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-06-11", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-06-11", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-06-11", campus: "亀戸", job: "保育", wage: 1400, hours: 0.5, pay: 700, transit: 1035, allowance: 0, timeSpan: "06:00PM-06:30PM", memo: "" },
+          { date: "2026-06-18", campus: "下高井戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-06-18", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-06-18", campus: "下高井戸", job: "保育", wage: 1400, hours: 0.5, pay: 700, transit: 1035, allowance: 0, timeSpan: "06:00PM-06:30PM", memo: "" },
+          { date: "2026-06-19", campus: "下高井戸", job: "保育", wage: 1400, hours: 1.5, pay: 2100, transit: 0, allowance: 0, timeSpan: "02:30PM-04:00PM", memo: "" },
+          { date: "2026-06-19", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-06-25", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-06-25", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-06-25", campus: "亀戸", job: "保育", wage: 1400, hours: 0.5, pay: 700, transit: 1035, allowance: 0, timeSpan: "06:00PM-06:30PM", memo: "" },
+          { date: "2026-06-26", campus: "下高井戸", job: "保育", wage: 1400, hours: 1.5, pay: 2100, transit: 280, allowance: 0, timeSpan: "02:30PM-04:00PM", memo: "" },
+          { date: "2026-06-26", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 280, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-06-12", campus: "下高井戸", job: "保育", wage: 1400, hours: 1.5, pay: 2100, transit: 280, allowance: 0, timeSpan: "02:30PM-04:00PM", memo: "" },
+          { date: "2026-06-12", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 280, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-06-15", campus: "自宅", job: "インターン", wage: 1400, hours: 3, pay: 4200, transit: 0, allowance: 0, timeSpan: "02:00PM-05:00PM", memo: "" }
+        ],
+        "2026-06": [
+          { date: "2026-04-25", campus: "自宅", job: "その他", wage: 0, hours: 1, pay: 0, transit: 0, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-07", campus: "亀戸", job: "保育", wage: 1400, hours: 3, pay: 4200, transit: 1035, allowance: 0, timeSpan: "01:00PM-04:00PM", memo: "" },
+          { date: "2026-05-07", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-05-07", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "06:00PM-07:00PM", memo: "" },
+          { date: "2026-05-14", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-14", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-05-14", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "06:00PM-07:00PM", memo: "" },
+          { date: "2026-05-21", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-21", campus: "亀戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-05-21", campus: "亀戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "06:00PM-07:00PM", memo: "" },
+          { date: "2026-05-28", campus: "下高井戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-28", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 2, pay: 3200, transit: 1035, allowance: 0, timeSpan: "04:00PM-06:00PM", memo: "" },
+          { date: "2026-05-28", campus: "下高井戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 1035, allowance: 0, timeSpan: "06:00PM-07:00PM", memo: "" },
+          { date: "2026-05-08", campus: "下高井戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 0, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-08", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-05-15", campus: "下高井戸", job: "保育", wage: 1400, hours: 1, pay: 1400, transit: 0, allowance: 0, timeSpan: "03:00PM-04:00PM", memo: "" },
+          { date: "2026-05-15", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-05-22", campus: "下高井戸", job: "保育", wage: 1400, hours: 1.5, pay: 2100, transit: 0, allowance: 0, timeSpan: "02:30PM-04:00PM", memo: "" },
+          { date: "2026-05-22", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-05-29", campus: "下高井戸", job: "保育", wage: 1400, hours: 1.5, pay: 2100, transit: 0, allowance: 0, timeSpan: "02:30PM-04:00PM", memo: "" },
+          { date: "2026-05-29", campus: "下高井戸", job: "絵画造形", wage: 1600, hours: 1, pay: 1600, transit: 0, allowance: 0, timeSpan: "04:00PM-05:00PM", memo: "" },
+          { date: "2026-05-01", campus: "用賀", job: "保育", wage: 1400, hours: 2, pay: 2800, transit: 830, allowance: 0, timeSpan: "02:00PM-04:00PM", memo: "" }
+        ]
+      },
+      expenses: {}
     };
 
-    fillTimeOptions(document.getElementById(`start-${id}`), startDefault);
-    fillTimeOptions(document.getElementById(`end-${id}`), endDefault);
-    updateTimeFromSelect(id);
-}
+    let appData = loadData();
+    let activeMonth = "";
+    let globalCampus = "亀戸";
+    let expCampus = "亀戸";
+    let expBase64 = "";
+    let shiftBlockCount = 0;
+    let editingDateKey = null;
+    let editingExpenseIdx = null;
 
-function fillTimeOptions(sel, time) {
-    for (let h = 1; h <= 12; h++) {
-        ['AM', 'PM'].forEach(ampm => {
-            for (let m = 0; m < 60; m += 5) {
-                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
-                sel.add(new Option(val, val, false, selected));
-            }
-        });
-    }
-}
+    document.addEventListener("DOMContentLoaded", initApp);
 
-function updateTimeFromSelect(id) {
-    const block = document.getElementById(`block-${id}`);
-    if(!block) return;
-    const s = document.getElementById(`start-${id}`).value.split(' ');
-    const e = document.getElementById(`end-${id}`).value.split(' ');
-    const to24 = (ampm, t) => { 
-        let [h, m] = t.split(':').map(Number);
-        if (ampm === 'PM' && h !== 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        return h + (m / 60);
-    };
-    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
-    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
-    block.timeState.start = { ampm: s[0], hour: parseInt(s[1].split(':')[0]), minute: parseInt(s[1].split(':')[1]) };
-    block.timeState.end = { ampm: e[0], hour: parseInt(e[1].split(':')[0]), minute: parseInt(e[1].split(':')[1]) };
-    block.timeState.calculatedHours = diff;
-}
-
-function removeShiftBlock(id) {
-const block = document.getElementById(`block-${id}`);
-if (block) block.remove();
-}
-
-function updateTimeFromSelect(id) {
-    const s = document.getElementById(`start-${id}`).value.split(' ');
-    const e = document.getElementById(`end-${id}`).value.split(' ');
-    const to24 = (ampm, t) => { 
-        let [h, m] = t.split(':').map(Number);
-        if (ampm === 'PM' && h !== 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        return h + (m / 60);
-    };
-    const diff = Math.abs(to24(e[0], e[1]) - to24(s[0], s[1]));
-    document.getElementById(`display-${id}`).innerText = `${diff.toFixed(2)}h`;
-}
-        
-function calculateBlockTime(id) {
-    const block = document.getElementById(`block-${id}`);
-    if (!block) return;
-    const state = block.timeState;
-  
-    const start24 = to24(state.start);
-    const end24 = to24(state.end);
-    let diff = end24 - start24;
-    if (diff < 0) diff += 24;
-    block.querySelector(`#display-${id}`).innerText = `${diff.toFixed(2)}h`;
-    state.calculatedHours = diff;
-}
-
-function fillTimeOptions(sel, time) {
-    for (let h = 1; h <= 12; h++) {
-        ['AM', 'PM'].forEach(ampm => {
-            for (let m = 0; m < 60; m += 5) {
-                const val = `${ampm} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-                const selected = (ampm === time.ampm && h === time.hour && m === time.minute);
-                sel.add(new Option(val, val, false, selected));
-            }
-        });
-    }
-}
-
-function updateTimeFromSelect(id) {
-    const block = document.getElementById(`block-${id}`);
-    const s = document.getElementById(`start-${id}`).value.split(' ');
-    const e = document.getElementById(`end-${id}`).value.split(' ');
-    block.timeState.start = { ampm: s[0], hour: parseInt(s[1].split(':')[0]), minute: parseInt(s[1].split(':')[1]) };
-    block.timeState.end = { ampm: e[0], hour: parseInt(e[1].split(':')[0]), minute: parseInt(e[1].split(':')[1]) };
-    calculateBlockTime(id);
-}
-
-function to24(obj) {
-let h = obj.hour;
-if (obj.ampm === 'PM' && h !== 12) h += 12;
-if (obj.ampm === 'AM' && h === 12) h = 0;
-return h + (obj.minute / 60);
-}
-
-const start24 = to24(state.start);
-const end24 = to24(state.end);
-let diff = end24 - start24;
-if (diff < 0) diff += 24;
-
-
-function editDayGroup(dateKey) {
-const shiftsToEdit = appData.shifts[activeMonth].filter(s => s.date === dateKey);
-if (shiftsToEdit.length === 0) return;
-
-editingDateKey = dateKey;
-document.getElementById('form-panel-title').innerText = `【編集】 ${dateKey}`;
-document.getElementById('btn-save-shift').innerText = "変更を確定して保存";
-
-const dateInput = document.getElementById('shift-date');
-dateInput.value = dateKey;
-dateInput.disabled = true;
-
-const first = shiftsToEdit[0];
-const transitInput = document.getElementById('global-transit');
-transitInput.value = first.transit;
-
-let targetCampusBtn = null;
-document.querySelectorAll('.panel:nth-child(1) .pill-box:nth-of-type(1) .pill-btn').forEach(btn => {
-if (btn.innerText === first.campus) targetCampusBtn = btn;
-});
-if (targetCampusBtn) setGlobalCampus(first.campus, targetCampusBtn);
-if (first.campus !== '亀戸' && first.campus !== '下高井戸') {
-document.getElementById('custom-campus-name').value = first.campus;
-}
-
-let totalAllowance = 0;
-let combinedMemo = [];
-shiftsToEdit.forEach(s => {
-totalAllowance += (s.allowance || 0);
-if (s.memo && !combinedMemo.includes(s.memo)) combinedMemo.push(s.memo);
-});
-document.getElementById('custom-allowance').value = totalAllowance;
-document.getElementById('shift-memo').value = combinedMemo.join(' / ');
-
-const container = document.getElementById('shift-blocks-container');
-container.innerHTML = '';
-shiftBlockCount = 0;
-
-shiftsToEdit.forEach(s => {
-try {
-const parts = s.timeSpan.split('-');
-const sPart = parts[0], ePart = parts[1];
-
-const startObj = { ampm: sPart.slice(-2), hour: parseInt(sPart.slice(0,2)), minute: parseInt(sPart.slice(3,5)) };
-const endObj = { ampm: ePart.slice(-2), hour: parseInt(ePart.slice(0,2)), minute: parseInt(ePart.slice(3,5)) };
-
-addShiftBlock(s.job, startObj, endDefault = endObj);
-} catch (e) {
-addShiftBlock(s.job);
-}
-});
-renderDashboard();
-}
-
-function submitAllShifts() {
-const date = document.getElementById('shift-date').value;
-const transit = parseFloat(document.getElementById('global-transit').value) || 0;
-const allowance = parseFloat(document.getElementById('custom-allowance').value) || 0;
-const memo = document.getElementById('shift-memo').value || "";
-
-if (!date) { alert('日付を指定してください。'); return; }
-
-// 新機能：利用した日付を永続データとして内部保持
-localStorage.setItem('v17_lastUsedDate', date);
-
-const blocks = document.querySelectorAll('.shift-block-input');
-if (blocks.length === 0) { alert('セッションを1つ以上追加してください。'); return; }
-
-if (editingDateKey) {
-appData.shifts[activeMonth] = appData.shifts[activeMonth].filter(s => s.date !== editingDateKey);
-}
-
-if (!appData.shifts[activeMonth]) appData.shifts[activeMonth] = [];
-
-let finalCampusName = globalCampus;
-if (globalCampus === 'その他') {
-finalCampusName = document.getElementById('custom-campus-name').value || '他校舎';
-}
-
-blocks.forEach((block) => {
-const state = block.timeState;
-let wage = state.wage;
-if (state.job === 'その他') {
-wage = parseFloat(block.querySelector('.custom-wage-input').value) || 0;
-}
-
-const hrs = state.calculatedHours;
-const pay = Math.floor(wage * hrs);
-
-function padStr(obj) {
-return `${String(obj.hour).padStart(2,'0')}:${String(obj.minute).padStart(2,'0')}${obj.ampm}`;
-}
-const timeSpanText = `${padStr(state.start)}-${padStr(state.end)}`;
-
-appData.shifts[activeMonth].push({
-date, campus: finalCampusName, job: state.job, wage: wage, hours: hrs, pay: pay, transit: transit, allowance: 0, timeSpan: timeSpanText, memo: memo
-});
-});
-
-if (allowance > 0 && appData.shifts[activeMonth].length > 0) {
-appData.shifts[activeMonth][appData.shifts[activeMonth].length - 1].allowance = allowance;
-}
-
-saveMasterData();
-resetShiftForm();
-renderDashboard();
-}
-
-function removeDayGroup(date) {
-if(confirm(`${date} のシフト記録を一括削除しますか？`)) {
-appData.shifts[activeMonth] = appData.shifts[activeMonth].filter(s => s.date !== date);
-saveMasterData(); renderDashboard();
-if(editingDateKey === date) resetShiftForm();
-}
-}
-
-function switchMonth() { activeMonth = monthSelect.value; resetShiftForm(); renderDashboard(); }
-function getActiveShifts() { return appData.shifts[activeMonth] || []; }
-function getActiveExpenses() { return appData.expenses[activeMonth] || []; }
-function saveMasterData() { localStorage.setItem('v17_appMasterData', JSON.stringify(appData)); }
-
-function setExpCampus(campus, btn) {
-    expCampus = campus;
-    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function processExpenseImage(input) {
-    const file = input.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const img = new Image();
-        img.onload = function () {
-            const canvas = document.createElement('canvas');
-            const scale = Math.min(1, 300 / img.naturalWidth);
-            canvas.width = img.naturalWidth * scale;
-            canvas.height = img.naturalHeight * scale;
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            expBase64 = canvas.toDataURL('image/webp', 0.8);
-            updatePreview(expBase64);
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function updatePreview(src) {
-    const zone = document.getElementById('upload-zone');
-    let preview = document.getElementById('img-preview');
-    if (!preview) {
-        preview = document.createElement('img');
-        preview.id = 'img-preview';
-        preview.style.cssText = "width:60px; height:60px; margin-top:10px; border-radius:8px; object-fit:cover; display:block;";
-        zone.appendChild(preview);
-    }
-    preview.src = src;
-    document.getElementById('exp-file-label').innerText = "画像を選択中";
-    zone.classList.add('has-file');
-}
-
-function submitExpense() {
-    const amt = parseFloat(document.getElementById('exp-amount').value) || 0;
-    const note = document.getElementById('exp-note').value || "教材費";
-    if (amt <= 0) { alert('金額を入力してください。'); return; }
-
-    if (!appData.expenses) appData.expenses = {};
-    if (!appData.expenses[activeMonth]) appData.expenses[activeMonth] = [];
-
-    const expenseEntry = {
-        campus: expCampus,
-        amount: amt,
-        note: note,
-        receipt: expBase64 || (editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].receipt : ""),
-        date: editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].date : new Date().toLocaleDateString('ja-JP', {month:'2-digit', day:'2-digit'}),
-        paid: editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].paid : false
-    };
-
-    if (editingExpenseIdx !== null) {
-        appData.expenses[activeMonth][editingExpenseIdx] = expenseEntry;
-        editingExpenseIdx = null;
-        document.getElementById('expense-panel-title').innerText = "経費を登録";
-        document.getElementById('btn-save-expense').innerText = "経費を保存";
-    } else {
-        appData.expenses[activeMonth].push(expenseEntry);
+    function initApp() {
+      normalizeAllShifts();
+      ensureKnownMonths();
+      buildMonthOptions();
+      activeMonth = document.getElementById("global-month").value;
+      setTodayAsDefaultDate();
+      resetShiftForm(false);
+      resetExpenseForm(false);
+      renderDashboard();
     }
 
-    saveMasterData();
-    renderDashboard();
-    resetExpenseForm();
-}
-
-function resetExpenseForm() {
-    document.getElementById('exp-amount').value = '';
-    document.getElementById('exp-note').value = '';
-    document.getElementById('exp-file').value = '';
-    expBase64 = "";
-    document.getElementById('upload-zone').classList.remove('has-file');
-    document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
-    const preview = document.getElementById('img-preview');
-    if (preview) preview.remove();
-}
-
-function editExpense(idx) {
-    const currentExpenses = getActiveExpenses();
-    const item = currentExpenses[idx];
-    if (!item) return;
-
-    editingExpenseIdx = idx;
-    document.getElementById('expense-panel-title').innerText = "【編集】経費を修正";
-    document.getElementById('btn-save-expense').innerText = "変更を確定";
-
-    document.getElementById('exp-amount').value = item.amount;
-    document.getElementById('exp-note').value = item.note;
-    
-    // 画像があればプレビューを表示
-    if (item.receipt) {
-        expBase64 = item.receipt;
-        updatePreview(item.receipt);
-    } else {
-        expBase64 = "";
-        const preview = document.getElementById('img-preview');
-        if (preview) preview.remove();
-        document.getElementById('upload-zone').classList.remove('has-file');
-        document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return deepClone(INITIAL_DATA);
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed || typeof parsed !== "object") return deepClone(INITIAL_DATA);
+        if (!parsed.shifts) parsed.shifts = {};
+        if (!parsed.expenses) parsed.expenses = {};
+        return parsed;
+      } catch (error) {
+        console.warn("保存データの読み込みに失敗しました。初期データを使います。", error);
+        return deepClone(INITIAL_DATA);
+      }
     }
 
-    const pills = document.getElementById('exp-campus-pills');
-    pills.querySelectorAll('.pill-btn').forEach(btn => {
-        if (btn.innerText === item.campus) {
-            setExpCampus(item.campus, btn);
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    }
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function yen(num) {
+      return "¥" + Math.round(Number(num || 0)).toLocaleString("ja-JP");
+    }
+
+    function ensureKnownMonths() {
+      const months = new Set(Object.keys(appData.shifts || {}));
+      Object.keys(appData.expenses || {}).forEach(month => months.add(month));
+
+      const now = new Date();
+      for (let i = -3; i <= 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        months.add(monthKeyFromDate(d));
+      }
+
+      months.forEach(month => {
+        if (!appData.shifts[month]) appData.shifts[month] = [];
+        if (!appData.expenses[month]) appData.expenses[month] = [];
+      });
+    }
+
+    function buildMonthOptions() {
+      const monthSelect = document.getElementById("global-month");
+      const currentMonth = monthKeyFromDate(new Date());
+      const months = Array.from(new Set([
+        ...Object.keys(appData.shifts || {}),
+        ...Object.keys(appData.expenses || {}),
+        currentMonth
+      ])).sort();
+
+      monthSelect.innerHTML = "";
+      months.forEach(month => {
+        const [year, monthNum] = month.split("-");
+        const option = document.createElement("option");
+        option.value = month;
+        option.textContent = `${year}年${Number(monthNum)}月 支給分`;
+        monthSelect.appendChild(option);
+      });
+
+      monthSelect.value = months.includes(currentMonth) ? currentMonth : months[months.length - 1];
+    }
+
+    function monthKeyFromDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function switchMonth() {
+      activeMonth = document.getElementById("global-month").value;
+      editingDateKey = null;
+      editingExpenseIdx = null;
+      resetShiftForm(false);
+      resetExpenseForm(false);
+      renderDashboard();
+    }
+
+    function setTodayAsDefaultDate() {
+      const input = document.getElementById("shift-date");
+      if (!input.value) {
+        const today = new Date();
+        input.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+      }
+    }
+
+    function normalizeAllShifts() {
+      Object.keys(appData.shifts || {}).forEach(month => {
+        appData.shifts[month] = (appData.shifts[month] || []).map(entry => normalizeShiftEntry(entry));
+      });
+      saveData();
+    }
+
+    function normalizeShiftEntry(entry) {
+      const normalized = { ...entry };
+      const parsed = parseTimeSpan(normalized.timeSpan || "");
+      if (parsed) {
+        normalized.timeSpan = `${parsed.start}-${parsed.end}`;
+        normalized.hours = parsed.hours;
+      } else {
+        normalized.hours = Number(normalized.hours || 0);
+      }
+      normalized.wage = Number(normalized.wage ?? WAGES[normalized.job] ?? 0);
+      normalized.pay = Math.round(normalized.wage * Number(normalized.hours || 0));
+      normalized.transit = Number(normalized.transit || 0);
+      normalized.allowance = Number(normalized.allowance || 0);
+      normalized.memo = normalized.memo || "";
+      return normalized;
+    }
+
+    function parseTimeSpan(timeSpan) {
+      if (!timeSpan || typeof timeSpan !== "string") return null;
+      const parts = timeSpan.split("-");
+      if (parts.length !== 2) return null;
+      const start = normalizeTimeText(parts[0]);
+      const end = normalizeTimeText(parts[1]);
+      if (!start || !end) return null;
+      const startMin = timeToMinutes(start);
+      const endMin = timeToMinutes(end);
+      if (startMin === null || endMin === null || endMin <= startMin) return null;
+      return { start, end, hours: (endMin - startMin) / 60 };
+    }
+
+    function normalizeTimeText(value) {
+      if (!value) return null;
+      let text = String(value).trim().toUpperCase().replace(/\s+/g, "");
+
+      const ampmMatch = text.match(/^(\d{1,2}):(\d{2})(AM|PM)$/);
+      if (ampmMatch) {
+        let h = Number(ampmMatch[1]);
+        const m = Number(ampmMatch[2]);
+        const ampm = ampmMatch[3];
+        if (h < 1 || h > 12 || m < 0 || m > 59) return null;
+        if (ampm === "PM" && h !== 12) h += 12;
+        if (ampm === "AM" && h === 12) h = 0;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      }
+
+      text = text.replace("：", ":");
+      const colonMatch = text.match(/^(\d{1,2}):(\d{2})$/);
+      if (colonMatch) {
+        const h = Number(colonMatch[1]);
+        const m = Number(colonMatch[2]);
+        if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      }
+
+      const compactMatch = text.match(/^(\d{3,4})$/);
+      if (compactMatch) {
+        const raw = compactMatch[1].padStart(4, "0");
+        const h = Number(raw.slice(0, 2));
+        const m = Number(raw.slice(2));
+        if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      }
+
+      return null;
+    }
+
+    function timeToMinutes(value) {
+      const normalized = normalizeTimeText(value);
+      if (!normalized) return null;
+      const [h, m] = normalized.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function isWorkTimeInRange(value) {
+      const minutes = timeToMinutes(value);
+      return minutes !== null && minutes >= 8 * 60 && minutes <= 20 * 60;
+    }
+
+    function getActiveShifts() {
+      if (!appData.shifts[activeMonth]) appData.shifts[activeMonth] = [];
+      return appData.shifts[activeMonth];
+    }
+
+    function getActiveExpenses() {
+      if (!appData.expenses[activeMonth]) appData.expenses[activeMonth] = [];
+      return appData.expenses[activeMonth];
+    }
+
+    function groupShiftsByDate(month = activeMonth) {
+      const groups = {};
+      (appData.shifts[month] || []).forEach(entry => {
+        const date = entry.date || "日付未設定";
+        if (!groups[date]) {
+          groups[date] = {
+            date,
+            campus: entry.campus || "未設定",
+            memo: entry.memo || "",
+            sessions: [],
+            transit: 0,
+            allowance: 0
+          };
         }
-    });
-}
+        groups[date].sessions.push(entry);
+        groups[date].transit = Math.max(groups[date].transit, Number(entry.transit || 0));
+        groups[date].allowance = Math.max(groups[date].allowance, Number(entry.allowance || 0));
+        if (entry.memo) groups[date].memo = entry.memo;
+        if (entry.campus) groups[date].campus = entry.campus;
+      });
 
-function toggleExpensePaid(idx) {
-if (!appData.expenses[activeMonth]) return;
-appData.expenses[activeMonth][idx].paid = !appData.expenses[activeMonth][idx].paid;
-saveMasterData();
-renderDashboard();
-}
+      return Object.values(groups).sort((a, b) => a.date.localeCompare(b.date));
+    }
 
-function removeExpense(idx) {
-if(confirm('この経費データを削除しますか？')) {
-if (appData.expenses[activeMonth]) {
-appData.expenses[activeMonth].splice(idx, 1);
-if (editingExpenseIdx === parseInt(idx)) {
-editingExpenseIdx = null;
-document.getElementById('expense-panel-title').innerText = "経費を登録";
-document.getElementById('btn-save-expense').innerText = "経費を保存";
-}
-saveMasterData(); renderDashboard();
-}
-}
-}
+    function calcDayTotal(group) {
+      const sessionPay = group.sessions.reduce((sum, entry) => sum + Number(entry.pay || 0), 0);
+      const hours = group.sessions.reduce((sum, entry) => sum + Number(entry.hours || 0), 0);
+      return {
+        hours,
+        sessionPay,
+        transit: Number(group.transit || 0),
+        allowance: Number(group.allowance || 0),
+        total: sessionPay + Number(group.transit || 0) + Number(group.allowance || 0)
+      };
+    }
 
-function openLightbox(src) { document.getElementById('lightbox').style.display = "flex"; document.getElementById('lightbox-img').src = src; }
-function closeLightbox() { document.getElementById('lightbox').style.display = "none"; }
+    function setGlobalCampus(campus, btn) {
+      globalCampus = campus;
+      const buttons = document.querySelectorAll("#campus-pills .pill-btn");
+      buttons.forEach(button => button.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      document.getElementById("custom-campus-wrapper").classList.toggle("hidden", campus !== "その他");
+    }
 
-function renderDashboard() {
-const currentShifts = getActiveShifts();
-const currentExpenses = getActiveExpenses();
-const displayMonthText = activeMonth.split('-')[1];
-document.getElementById('salary-card-title').innerText = `${parseInt(displayMonthText)}月20日 支給額`;
+    function setCampusByName(campusName) {
+      const known = ["亀戸", "下高井戸"];
+      const buttons = document.querySelectorAll("#campus-pills .pill-btn");
+      buttons.forEach(button => button.classList.remove("active"));
 
-const mList = document.getElementById('shift-mobile-list'); mList.innerHTML = '';
-let grandHours = 0, grandSalary = 0;
+      if (known.includes(campusName)) {
+        globalCampus = campusName;
+        buttons.forEach(button => {
+          if (button.textContent.trim() === campusName) button.classList.add("active");
+        });
+        document.getElementById("custom-campus-wrapper").classList.add("hidden");
+        document.getElementById("custom-campus-name").value = "";
+      } else {
+        globalCampus = "その他";
+        buttons.forEach(button => {
+          if (button.textContent.trim() === "その他") button.classList.add("active");
+        });
+        document.getElementById("custom-campus-wrapper").classList.remove("hidden");
+        document.getElementById("custom-campus-name").value = campusName || "";
+      }
+    }
 
-const dayMap = {};
-currentShifts.forEach(s => {
-if (!dayMap[s.date]) {
-dayMap[s.date] = { date: s.date, campus: s.campus || '未指定', totalHours: 0, totalPay: 0, transit: s.transit || 0, allowance: 0, breakdown: {}, memos: [] };
-}
-dayMap[s.date].totalHours += s.hours;
-dayMap[s.date].totalPay += s.pay;
-dayMap[s.date].allowance += s.allowance;
-if (s.memo && !dayMap[s.date].memos.includes(s.memo)) dayMap[s.date].memos.push(s.memo);
+    function getSelectedCampusName() {
+      if (globalCampus === "その他") {
+        return document.getElementById("custom-campus-name").value.trim() || "その他";
+      }
+      return globalCampus;
+    }
 
-if (!dayMap[s.date].breakdown[s.job]) {
-dayMap[s.date].breakdown[s.job] = { hours: 0, spans: [] };
-}
-dayMap[s.date].breakdown[s.job].hours += s.hours;
-if (s.timeSpan) dayMap[s.date].breakdown[s.job].spans.push(s.timeSpan);
-});
+    function addShiftBlock(defaults = {}) {
+      shiftBlockCount += 1;
+      const id = shiftBlockCount;
+      const job = defaults.job || "保育";
+      const start = defaults.start || "15:00";
+      const end = defaults.end || "18:00";
+      const wage = Number(defaults.wage ?? WAGES[job] ?? 0);
 
-const sortedDays = Object.values(dayMap).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const blockHtml = `
+        <div class="shift-block-input" id="block-${id}" data-block-id="${id}" data-job="${job}" data-wage="${wage}">
+          <div class="shift-block-title">
+            <span>セッション ${id}</span>
+            <button type="button" class="btn-remove-block" onclick="removeShiftBlock(${id})">削除</button>
+          </div>
+          <label class="group-label">職種</label>
+          <div class="pill-box job-pills">
+            <button type="button" class="pill-btn ${job === "保育" ? "active" : ""}" onclick="setBlockJob(${id}, '保育', 1400, this)">保育</button>
+            <button type="button" class="pill-btn ${job === "絵画造形" ? "active" : ""}" onclick="setBlockJob(${id}, '絵画造形', 1600, this)">絵画造形</button>
+            <button type="button" class="pill-btn ${job === "インターン" ? "active" : ""}" onclick="setBlockJob(${id}, 'インターン', 1400, this)">インターン</button>
+            <button type="button" class="pill-btn ${job === "その他" ? "active" : ""}" onclick="setBlockJob(${id}, 'その他', 0, this)">その他</button>
+          </div>
+          <div class="time-row">
+            <div>
+              <label class="group-label">開始</label>
+              <input class="time-input" id="start-${id}" type="text" value="${start}" inputmode="numeric" placeholder="15:00" oninput="updateManualTime(${id})" onblur="formatTimeInput(${id}, 'start')" />
+            </div>
+            <div>
+              <label class="group-label">終了</label>
+              <input class="time-input" id="end-${id}" type="text" value="${end}" inputmode="numeric" placeholder="18:00" oninput="updateManualTime(${id})" onblur="formatTimeInput(${id}, 'end')" />
+            </div>
+          </div>
+          <div class="time-help">08:00〜20:00の範囲で入力してください。例: 15:00、1630、18:30</div>
+          <div class="time-display" id="display-${id}">0.00h</div>
+          <div class="error-text hidden" id="error-${id}"></div>
+        </div>`;
 
-sortedDays.forEach((d) => {
-const finalDayTotal = d.totalPay + d.transit + d.allowance;
-grandHours += d.totalHours; grandSalary += finalDayTotal;
+      document.getElementById("shift-blocks-container").insertAdjacentHTML("beforeend", blockHtml);
+      updateManualTime(id);
+    }
 
-let breakdownHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
-for (const [jobName, info] of Object.entries(d.breakdown)) {
-breakdownHtml += `<div>
-                       <span class="badge-job badge-${jobName}">${jobName}</span> 
-                       <span style="font-weight:700; margin-left:4px;">${info.hours.toFixed(2)}h</span> 
-                       <span style="color:var(--primary-light); font-size:11px; margin-left:4px;">(${info.spans.join(', ')})</span>
-                   </div>`;
-}
-if (d.memos.length > 0) breakdownHtml += `<div style="color:var(--text-sub); font-size:11px; margin-top:2px; font-weight:500;">メモ: ${d.memos.join(' / ')}</div>`;
-breakdownHtml += '</div>';
+    function removeShiftBlock(id) {
+      const block = document.getElementById(`block-${id}`);
+      if (!block) return;
+      if (document.querySelectorAll(".shift-block-input").length <= 1) {
+        alert("勤務セッションは最低1つ必要です。");
+        return;
+      }
+      block.remove();
+    }
 
-const card = `<div class="mobile-list-item">
-                   <div class="item-row-top">
-                       <div>
-                           <span class="campus-prefix">[${d.campus}]</span>
-                           <strong style="font-size:14px;">${d.date.replace(/-/g, '/')}</strong>
-                       </div>
-                       <div style="font-weight:800; font-size:14px; color:var(--primary);">¥${finalDayTotal.toLocaleString()}</div>
-                   </div>
-                   <div class="item-row-mid">${breakdownHtml}</div>
-                   <div class="item-row-bottom">
-                       <div style="color:var(--text-sub);">
-                           内訳: 労 ¥${d.totalPay.toLocaleString()} / 交 ¥${d.transit.toLocaleString()} ${d.allowance > 0 ? '/ 手 ¥' + d.allowance.toLocaleString() : ''}
-                       </div>
-                       <div class="action-links">
-                           <button class="btn-link edit" onclick="editDayGroup('${d.date}')">編集</button>
-                           <button class="btn-link del" onclick="removeDayGroup('${d.date}')">削除</button>
-                       </div>
-                   </div>
-               </div>`;
-mList.insertAdjacentHTML('beforeend', card);
-});
+    function setBlockJob(id, job, wage, btn) {
+      const block = document.getElementById(`block-${id}`);
+      if (!block) return;
+      block.dataset.job = job;
+      block.dataset.wage = String(wage);
+      btn.parentElement.querySelectorAll(".pill-btn").forEach(button => button.classList.remove("active"));
+      btn.classList.add("active");
+      updateManualTime(id);
+    }
 
-let kameidoUsed = 0, takaidoUsed = 0;
-const eMinilist = document.getElementById('expense-mini-list'); eMinilist.innerHTML = '';
-currentExpenses.forEach((e) => {
-if (e.campus === '亀戸') kameidoUsed += e.amount;
-if (e.campus === '下高井戸') takaidoUsed += e.amount;
-});
+    function formatTimeInput(id, type) {
+      const input = document.getElementById(`${type}-${id}`);
+      if (!input) return;
+      const normalized = normalizeTimeText(input.value);
+      if (normalized) input.value = normalized;
+      updateManualTime(id);
+    }
 
-[...currentExpenses].reverse().forEach((e, idx) => {
-const origIdx = currentExpenses.length - 1 - idx;
-const imgNode = e.receipt ? `<img src="${e.receipt}" class="thumb-receipt" onclick="openLightbox('${e.receipt}')">` : '<span style="color:var(--text-sub); font-size:10px;">なし</span>';
-const isPaidChecked = e.paid ? 'checked' : '';
-const paidClass = e.paid ? 'paid-done' : '';
+    function updateManualTime(id) {
+      const block = document.getElementById(`block-${id}`);
+      if (!block) return;
 
-const item = `<div class="expense-item ${paidClass}">
-                   <div class="expense-item-left">
-                       <input type="checkbox" class="expense-chk" ${isPaidChecked} onclick="toggleExpensePaid(${origIdx})">
-                       <span><strong>[${e.campus}]</strong> ¥${e.amount.toLocaleString()}<br><span style="color:var(--text-sub); font-size:10px;">${e.date} - ${e.note}</span></span>
-                   </div>
-                   <div style="display:flex; align-items:center; gap:8px;">
-                       ${imgNode}
-                       <button class="btn-action-icon edit" onclick="editExpense(${origIdx})">編集</button>
-                       <button class="btn-action-icon del" onclick="removeExpense('${origIdx}')">削除</button>
-                   </div>
-               </div>`;
-eMinilist.insertAdjacentHTML('beforeend', item);
-});
+      const startInput = document.getElementById(`start-${id}`);
+      const endInput = document.getElementById(`end-${id}`);
+      const display = document.getElementById(`display-${id}`);
+      const error = document.getElementById(`error-${id}`);
 
-const kRem = Math.max(0, 6000 - kameidoUsed); const tRem = Math.max(0, 2000 - takaidoUsed);
-const kPct = Math.min(100, (kameidoUsed / 6000) * 100); const tPct = Math.min(100, (takaidoUsed / 2000) * 100);
+      const start = normalizeTimeText(startInput.value);
+      const end = normalizeTimeText(endInput.value);
+      const startMin = start ? timeToMinutes(start) : null;
+      const endMin = end ? timeToMinutes(end) : null;
 
-document.getElementById('dash-salary').innerText = '¥' + grandSalary.toLocaleString();
-document.getElementById('dash-hours').innerText = grandHours.toFixed(1) + 'h';
-document.getElementById('dash-kameido-rem').innerText = '¥' + kRem.toLocaleString();
-document.getElementById('dash-kameido-used').innerText = `利用: ¥${kameidoUsed.toLocaleString()} / ¥6,000`;
-const pbKameido = document.getElementById('pb-kameido'); pbKameido.style.width = kPct + '%';
-pbKameido.className = `progress-bar ${kPct >= 90 ? 'danger' : kPct >= 60 ? 'warning' : ''}`;
+      block.dataset.valid = "false";
+      block.dataset.hours = "0";
+      display.textContent = "0.00h";
+      error.classList.add("hidden");
+      error.textContent = "";
 
-document.getElementById('dash-takaido-rem').innerText = '¥' + tRem.toLocaleString();
-document.getElementById('dash-takaido-used').innerText = `利用: ¥${takaidoUsed.toLocaleString()} / ¥2,000`;
-const pbTakaido = document.getElementById('pb-takaido'); pbTakaido.style.width = tPct + '%';
-pbTakaido.className = `progress-bar ${tPct >= 90 ? 'danger' : tPct >= 60 ? 'warning' : ''}`;
-}
-</script>
+      if (!startInput.value.trim() || !endInput.value.trim()) return;
+      if (!start || !end) {
+        showBlockError(error, "時刻は 15:00 または 1530 のように入力してください。");
+        return;
+      }
+      if (!isWorkTimeInRange(start) || !isWorkTimeInRange(end)) {
+        showBlockError(error, "勤務時間は08:00〜20:00の範囲だけ登録できます。");
+        return;
+      }
+      if (endMin <= startMin) {
+        showBlockError(error, "終了時刻は開始時刻より後にしてください。");
+        return;
+      }
+
+      const hours = (endMin - startMin) / 60;
+      block.dataset.valid = "true";
+      block.dataset.hours = String(hours);
+      block.dataset.start = start;
+      block.dataset.end = end;
+      display.textContent = `${hours.toFixed(2)}h / ${yen(hours * Number(block.dataset.wage || 0))}`;
+    }
+
+    function showBlockError(errorElement, message) {
+      errorElement.textContent = message;
+      errorElement.classList.remove("hidden");
+    }
+
+    function resetShiftForm(clearDate = true) {
+      editingDateKey = null;
+      document.getElementById("form-panel-title").querySelector("span").textContent = "シフトを登録";
+      document.getElementById("btn-save-shift").textContent = "シフトを一括保存";
+      if (clearDate) document.getElementById("shift-date").value = "";
+      setTodayAsDefaultDate();
+      setCampusByName("亀戸");
+      document.getElementById("global-transit").value = "1035";
+      document.getElementById("custom-allowance").value = "0";
+      document.getElementById("shift-memo").value = "";
+      document.getElementById("shift-blocks-container").innerHTML = "";
+      shiftBlockCount = 0;
+      addShiftBlock({ job: "保育", start: "15:00", end: "18:00" });
+    }
+
+    function submitAllShifts() {
+      const date = document.getElementById("shift-date").value;
+      const campus = getSelectedCampusName();
+      const transit = Number(document.getElementById("global-transit").value || 0);
+      const allowance = Number(document.getElementById("custom-allowance").value || 0);
+      const memo = document.getElementById("shift-memo").value.trim();
+      const blocks = Array.from(document.querySelectorAll(".shift-block-input"));
+
+      if (!date) {
+        alert("勤務日を入力してください。");
+        return;
+      }
+      if (!campus) {
+        alert("勤務校舎を入力してください。");
+        return;
+      }
+      if (blocks.length === 0) {
+        alert("勤務セッションを1つ以上入力してください。");
+        return;
+      }
+
+      const newEntries = [];
+      for (const [index, block] of blocks.entries()) {
+        const id = block.dataset.blockId;
+        formatTimeInput(id, "start");
+        formatTimeInput(id, "end");
+        updateManualTime(id);
+
+        if (block.dataset.valid !== "true") {
+          alert("勤務時間にエラーがあります。08:00〜20:00の24時間制で入力してください。");
+          return;
+        }
+
+        const job = block.dataset.job || "保育";
+        const wage = Number(block.dataset.wage || WAGES[job] || 0);
+        const hours = Number(block.dataset.hours || 0);
+        const start = block.dataset.start;
+        const end = block.dataset.end;
+
+        newEntries.push({
+          date,
+          campus,
+          job,
+          wage,
+          hours,
+          pay: Math.round(wage * hours),
+          transit: index === 0 ? transit : 0,
+          allowance: index === 0 ? allowance : 0,
+          timeSpan: `${start}-${end}`,
+          memo
+        });
+      }
+
+      if (!appData.shifts[activeMonth]) appData.shifts[activeMonth] = [];
+      const exists = appData.shifts[activeMonth].some(entry => entry.date === date);
+      if (!editingDateKey && exists) {
+        const ok = confirm("同じ勤務日のシフトがすでにあります。置き換えますか？");
+        if (!ok) return;
+      }
+
+      appData.shifts[activeMonth] = appData.shifts[activeMonth].filter(entry => entry.date !== date);
+      appData.shifts[activeMonth].push(...newEntries);
+      appData.shifts[activeMonth].sort((a, b) => (a.date + a.timeSpan).localeCompare(b.date + b.timeSpan));
+
+      saveData();
+      resetShiftForm(false);
+      renderDashboard();
+    }
+
+    function editShiftByDate(date) {
+      const group = groupShiftsByDate(activeMonth).find(item => item.date === date);
+      if (!group) return;
+
+      editingDateKey = date;
+      document.getElementById("form-panel-title").querySelector("span").textContent = `${date} のシフトを編集`;
+      document.getElementById("btn-save-shift").textContent = "編集内容を保存";
+      document.getElementById("shift-date").value = date;
+      setCampusByName(group.campus);
+      document.getElementById("global-transit").value = group.transit || 0;
+      document.getElementById("custom-allowance").value = group.allowance || 0;
+      document.getElementById("shift-memo").value = group.memo || "";
+      document.getElementById("shift-blocks-container").innerHTML = "";
+      shiftBlockCount = 0;
+
+      group.sessions.forEach(session => {
+        const parsed = parseTimeSpan(session.timeSpan);
+        addShiftBlock({
+          job: session.job || "保育",
+          wage: session.wage ?? WAGES[session.job] ?? 0,
+          start: parsed ? parsed.start : "15:00",
+          end: parsed ? parsed.end : "18:00"
+        });
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteShiftByDate(date) {
+      const ok = confirm(`${date} のシフトを削除しますか？`);
+      if (!ok) return;
+      appData.shifts[activeMonth] = getActiveShifts().filter(entry => entry.date !== date);
+      saveData();
+      if (editingDateKey === date) resetShiftForm(false);
+      renderDashboard();
+    }
+
+    function setExpCampus(campus, btn) {
+      expCampus = campus;
+      document.querySelectorAll("#exp-campus-pills .pill-btn").forEach(button => button.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+    }
+
+    function setExpCampusByName(campus) {
+      expCampus = campus;
+      document.querySelectorAll("#exp-campus-pills .pill-btn").forEach(button => {
+        button.classList.toggle("active", button.textContent.trim() === campus);
+      });
+    }
+
+    function processExpenseImage(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        alert("画像ファイルを選んでください。");
+        input.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = event => {
+        const img = new Image();
+        img.onload = () => {
+          const maxSide = 1280;
+          let { width, height } = img;
+          if (width > maxSide || height > maxSide) {
+            if (width > height) {
+              height = Math.round(height * (maxSide / width));
+              width = maxSide;
+            } else {
+              width = Math.round(width * (maxSide / height));
+              height = maxSide;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          expBase64 = canvas.toDataURL("image/webp", 0.82);
+
+          const zone = document.getElementById("upload-zone");
+          zone.classList.add("has-file");
+          document.getElementById("exp-file-label").textContent = "レシート画像を選択済み";
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function submitExpense() {
+      const amount = Number(document.getElementById("exp-amount").value || 0);
+      const note = document.getElementById("exp-note").value.trim();
+
+      if (!amount || amount <= 0) {
+        alert("購入金額を入力してください。");
+        return;
+      }
+      if (!note) {
+        alert("品名・用途を入力してください。");
+        return;
+      }
+
+      const expenses = getActiveExpenses();
+      const payload = {
+        campus: expCampus,
+        amount,
+        note,
+        image: expBase64,
+        paid: false,
+        createdAt: new Date().toISOString()
+      };
+
+      if (editingExpenseIdx !== null) {
+        const old = expenses[editingExpenseIdx] || {};
+        payload.paid = Boolean(old.paid);
+        payload.createdAt = old.createdAt || payload.createdAt;
+        if (!payload.image && old.image) payload.image = old.image;
+        expenses[editingExpenseIdx] = payload;
+      } else {
+        expenses.push(payload);
+      }
+
+      saveData();
+      resetExpenseForm(false);
+      renderDashboard();
+    }
+
+    function resetExpenseForm() {
+      editingExpenseIdx = null;
+      expBase64 = "";
+      setExpCampusByName("亀戸");
+      document.getElementById("expense-panel-title").querySelector("span").textContent = "経費を登録";
+      document.getElementById("btn-save-expense").textContent = "経費を保存";
+      document.getElementById("exp-amount").value = "";
+      document.getElementById("exp-note").value = "";
+      document.getElementById("exp-file").value = "";
+      document.getElementById("upload-zone").classList.remove("has-file");
+      document.getElementById("exp-file-label").textContent = "タップして領収書をインポート";
+    }
+
+    function editExpense(index) {
+      const item = getActiveExpenses()[index];
+      if (!item) return;
+      editingExpenseIdx = index;
+      setExpCampusByName(item.campus || "亀戸");
+      document.getElementById("exp-amount").value = item.amount || "";
+      document.getElementById("exp-note").value = item.note || "";
+      expBase64 = item.image || "";
+      document.getElementById("expense-panel-title").querySelector("span").textContent = "経費を編集";
+      document.getElementById("btn-save-expense").textContent = "編集内容を保存";
+      if (expBase64) {
+        document.getElementById("upload-zone").classList.add("has-file");
+        document.getElementById("exp-file-label").textContent = "レシート画像を選択済み";
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteExpense(index) {
+      const ok = confirm("この経費を削除しますか？");
+      if (!ok) return;
+      getActiveExpenses().splice(index, 1);
+      saveData();
+      resetExpenseForm(false);
+      renderDashboard();
+    }
+
+    function toggleExpensePaid(index) {
+      const item = getActiveExpenses()[index];
+      if (!item) return;
+      item.paid = !Boolean(item.paid);
+      saveData();
+      renderDashboard();
+    }
+
+    function openReceipt(src) {
+      if (!src) return;
+      document.getElementById("lightbox-img").src = src;
+      document.getElementById("lightbox").style.display = "flex";
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+      document.getElementById("lightbox-img").src = "";
+    }
+
+    function renderDashboard() {
+      ensureKnownMonths();
+      renderStats();
+      renderShiftList();
+      renderExpenseList();
+    }
+
+    function renderStats() {
+      const groups = groupShiftsByDate(activeMonth);
+      let totalSalary = 0;
+      let totalHours = 0;
+
+      groups.forEach(group => {
+        const totals = calcDayTotal(group);
+        totalSalary += totals.total;
+        totalHours += totals.hours;
+      });
+
+      const [year, monthNum] = activeMonth.split("-");
+      document.getElementById("salary-card-title").textContent = `${year}年${Number(monthNum)}月 予想給与`;
+      document.getElementById("dash-salary").textContent = yen(totalSalary);
+      document.getElementById("dash-hours").textContent = `${totalHours.toFixed(1)}h`;
+
+      renderBudget("亀戸", "dash-kameido-rem", "dash-kameido-used", "pb-kameido");
+      renderBudget("下高井戸", "dash-takaido-rem", "dash-takaido-used", "pb-takaido");
+    }
+
+    function renderBudget(campus, remId, usedId, barId) {
+      const budget = BUDGETS[campus] || 0;
+      const used = getActiveExpenses()
+        .filter(item => item.campus === campus)
+        .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const remaining = budget - used;
+      const percent = budget > 0 ? Math.min(100, Math.max(0, (used / budget) * 100)) : 0;
+
+      document.getElementById(remId).textContent = yen(remaining);
+      document.getElementById(usedId).textContent = `利用: ${yen(used)} / ${yen(budget)}`;
+
+      const bar = document.getElementById(barId);
+      bar.style.width = `${percent}%`;
+      bar.classList.remove("warning", "danger");
+      if (percent >= 90) bar.classList.add("danger");
+      else if (percent >= 70) bar.classList.add("warning");
+    }
+
+    function renderShiftList() {
+      const list = document.getElementById("shift-mobile-list");
+      const groups = groupShiftsByDate(activeMonth);
+
+      if (groups.length === 0) {
+        list.innerHTML = `<div class="empty-state">この月のシフトはまだありません。</div>`;
+        return;
+      }
+
+      list.innerHTML = groups.map(group => {
+        const totals = calcDayTotal(group);
+        const sessionsHtml = group.sessions.map(session => {
+          const parsed = parseTimeSpan(session.timeSpan);
+          const span = parsed ? `${parsed.start}-${parsed.end}` : escapeHtml(session.timeSpan || "時間未設定");
+          const badgeClass = `badge-${session.job || "その他"}`;
+          return `
+            <div>
+              <span class="badge-job ${badgeClass}">${escapeHtml(session.job || "その他")}</span>
+              ${span} / ${Number(session.hours || 0).toFixed(2)}h / ${yen(session.pay || 0)}
+            </div>`;
+        }).join("");
+
+        return `
+          <div class="mobile-list-item">
+            <div class="item-row-top">
+              <div>
+                <div style="font-weight:800; font-size:14px;">${escapeHtml(group.date)}</div>
+                <div><span class="campus-prefix">${escapeHtml(group.campus)}</span></div>
+              </div>
+              <div style="text-align:right; font-weight:800;">${yen(totals.total)}</div>
+            </div>
+            <div class="item-row-mid">
+              ${sessionsHtml}
+              ${group.memo ? `<div style="margin-top:4px; color:var(--text-sub);">メモ: ${escapeHtml(group.memo)}</div>` : ""}
+            </div>
+            <div class="item-row-bottom">
+              <div>勤務 ${totals.hours.toFixed(1)}h / 交通費 ${yen(totals.transit)} / 手当 ${yen(totals.allowance)}</div>
+              <div class="action-links">
+                <button type="button" class="btn-link edit" onclick="editShiftByDate('${escapeAttr(group.date)}')">編集</button>
+                <button type="button" class="btn-link del" onclick="deleteShiftByDate('${escapeAttr(group.date)}')">削除</button>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderExpenseList() {
+      const box = document.getElementById("expense-mini-list");
+      const expenses = getActiveExpenses();
+
+      if (expenses.length === 0) {
+        box.innerHTML = `<div class="empty-state" style="border-radius:12px;">この月の経費はまだありません。</div>`;
+        return;
+      }
+
+      box.innerHTML = expenses.map((item, index) => {
+        const img = item.image
+          ? `<img class="thumb-receipt" src="${item.image}" alt="レシート" onclick="openReceipt('${item.image}')">`
+          : `<div class="thumb-receipt" style="display:flex;align-items:center;justify-content:center;color:var(--text-sub);font-size:10px;">なし</div>`;
+
+        return `
+          <div class="expense-item ${item.paid ? "paid-done" : ""}">
+            <div class="expense-item-left">
+              <input class="expense-chk" type="checkbox" ${item.paid ? "checked" : ""} onchange="toggleExpensePaid(${index})" />
+              ${img}
+              <div class="expense-item-text">
+                <span style="font-weight:800;">${escapeHtml(item.campus || "")} / ${yen(item.amount || 0)}</span>
+                <span style="color:var(--text-sub);">${escapeHtml(item.note || "")}</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:4px; flex:0 0 auto;">
+              <button type="button" class="btn-action-icon edit" onclick="editExpense(${index})">編集</button>
+              <button type="button" class="btn-action-icon del" onclick="deleteExpense(${index})">削除</button>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    function resetToInitialData() {
+      const ok = confirm("保存済みデータを消して、最初のデータに戻しますか？\nこの操作は元に戻せません。");
+      if (!ok) return;
+      appData = deepClone(INITIAL_DATA);
+      normalizeAllShifts();
+      ensureKnownMonths();
+      buildMonthOptions();
+      activeMonth = document.getElementById("global-month").value;
+      resetShiftForm(false);
+      resetExpenseForm(false);
+      renderDashboard();
+    }
+  </script>
 </body>
 </html>
