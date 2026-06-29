@@ -60,8 +60,13 @@
         .pill-btn.active { background: var(--surface); color: var(--primary); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 
         .form-stack { display: flex; flex-direction: column; gap: 12px; }
-        .field { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-        .field label { font-size: 11px; font-weight: 700; color: var(--text-sub); }
+        .field { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            width: 100%; 
+            overflow: hidden;
+        }
         .field input { 
             padding: 10px 12px; 
             border: 1px solid var(--border); 
@@ -74,8 +79,13 @@
             outline: none; 
             transition: border 0.2s; 
             box-sizing: border-box;
+            
             display: block;
+            max-width: 100%;
+            -webkit-appearance: none;
         }
+        .field label { font-size: 11px; font-weight: 700; color: var(--text-sub); }
+
         .field input:focus { border-color: var(--primary-light); background: var(--surface); }
         
         .hidden { display: none !important; }
