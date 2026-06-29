@@ -664,100 +664,116 @@ function getActiveExpenses() { return appData.expenses[activeMonth] || []; }
 function saveMasterData() { localStorage.setItem('v17_appMasterData', JSON.stringify(appData)); }
 
 function setExpCampus(campus, btn) {
-expCampus = campus;
-btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
+    expCampus = campus;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 }
 
 function processExpenseImage(input) {
-const file = input.files[0]; if (!file) return;
-const zone = document.getElementById('upload-zone');
-document.getElementById('exp-file-label').innerText = "イメージの読み込み完了";
-zone.classList.add('has-file');
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const scale = Math.min(1, 300 / img.naturalWidth);
+            canvas.width = img.naturalWidth * scale;
+            canvas.height = img.naturalHeight * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            expBase64 = canvas.toDataURL('image/webp', 0.8);
+            updatePreview(expBase64);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
-const reader = new FileReader();
-reader.onload = function (e) {
-const img = new Image();
-img.onload = function () {
-const canvas = document.createElement('canvas');
-canvas.width = img.naturalWidth;
-canvas.height = img.naturalHeight;
-const ctx = canvas.getContext('2d'); 
-ctx.drawImage(img, 0, 0);
-expBase64 = canvas.toDataURL('image/webp', 0.90);
-};
-img.src = e.target.result;
-};
-reader.readAsDataURL(file);
+function updatePreview(src) {
+    const zone = document.getElementById('upload-zone');
+    let preview = document.getElementById('img-preview');
+    if (!preview) {
+        preview = document.createElement('img');
+        preview.id = 'img-preview';
+        preview.style.cssText = "width:60px; height:60px; margin-top:10px; border-radius:8px; object-fit:cover; display:block;";
+        zone.appendChild(preview);
+    }
+    preview.src = src;
+    document.getElementById('exp-file-label').innerText = "画像を選択中";
+    zone.classList.add('has-file');
 }
 
 function submitExpense() {
-const amt = parseFloat(document.getElementById('exp-amount').value) || 0;
-const note = document.getElementById('exp-note').value || "教材費";
-if (amt <= 0) { alert('金額を入力してください。'); return; }
+    const amt = parseFloat(document.getElementById('exp-amount').value) || 0;
+    const note = document.getElementById('exp-note').value || "教材費";
+    if (amt <= 0) { alert('金額を入力してください。'); return; }
 
-if (!appData.expenses[activeMonth]) appData.expenses[activeMonth] = [];
+    if (!appData.expenses) appData.expenses = {};
+    if (!appData.expenses[activeMonth]) appData.expenses[activeMonth] = [];
 
-if (editingExpenseIdx !== null) {
-const oldItem = appData.expenses[activeMonth][editingExpenseIdx];
-appData.expenses[activeMonth][editingExpenseIdx] = {
-campus: expCampus,
-amount: amt,
-note: note,
-receipt: expBase64 || oldItem.receipt,
-date: oldItem.date,
-paid: oldItem.paid || false
-};
-editingExpenseIdx = null;
-document.getElementById('expense-panel-title').innerText = "経費を登録";
-document.getElementById('btn-save-expense').innerText = "経費を保存";
-} else {
-appData.expenses[activeMonth].push({ 
-campus: expCampus, 
-amount: amt, 
-note: note, 
-receipt: expBase64, 
-date: new Date().toLocaleDateString('ja-JP', {month:'2-digit', day:'2-digit'}),
-paid: false 
-});
+    const expenseEntry = {
+        campus: expCampus,
+        amount: amt,
+        note: note,
+        receipt: expBase64 || (editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].receipt : ""),
+        date: editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].date : new Date().toLocaleDateString('ja-JP', {month:'2-digit', day:'2-digit'}),
+        paid: editingExpenseIdx !== null ? appData.expenses[activeMonth][editingExpenseIdx].paid : false
+    };
+
+    if (editingExpenseIdx !== null) {
+        appData.expenses[activeMonth][editingExpenseIdx] = expenseEntry;
+        editingExpenseIdx = null;
+        document.getElementById('expense-panel-title').innerText = "経費を登録";
+        document.getElementById('btn-save-expense').innerText = "経費を保存";
+    } else {
+        appData.expenses[activeMonth].push(expenseEntry);
+    }
+
+    saveMasterData();
+    renderDashboard();
+    resetExpenseForm();
 }
 
-saveMasterData(); renderDashboard();
-document.getElementById('exp-amount').value = '';
-document.getElementById('exp-note').value = '';
-document.getElementById('exp-file').value = '';
-document.getElementById('upload-zone').classList.remove('has-file');
-document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
-expBase64 = "";
+function resetExpenseForm() {
+    document.getElementById('exp-amount').value = '';
+    document.getElementById('exp-note').value = '';
+    document.getElementById('exp-file').value = '';
+    expBase64 = "";
+    document.getElementById('upload-zone').classList.remove('has-file');
+    document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
+    const preview = document.getElementById('img-preview');
+    if (preview) preview.remove();
 }
 
 function editExpense(idx) {
-const currentExpenses = getActiveExpenses();
-const item = currentExpenses[idx];
-if (!item) return;
+    const currentExpenses = getActiveExpenses();
+    const item = currentExpenses[idx];
+    if (!item) return;
 
-editingExpenseIdx = idx;
-document.getElementById('expense-panel-title').innerText = "【編集】経費を修正";
-document.getElementById('btn-save-expense').innerText = "変更を確定";
+    editingExpenseIdx = idx;
+    document.getElementById('expense-panel-title').innerText = "【編集】経費を修正";
+    document.getElementById('btn-save-expense').innerText = "変更を確定";
 
-document.getElementById('exp-amount').value = item.amount;
-document.getElementById('exp-note').value = item.note;
-expBase64 = ""; 
+    document.getElementById('exp-amount').value = item.amount;
+    document.getElementById('exp-note').value = item.note;
+    
+    // 画像があればプレビューを表示
+    if (item.receipt) {
+        expBase64 = item.receipt;
+        updatePreview(item.receipt);
+    } else {
+        expBase64 = "";
+        const preview = document.getElementById('img-preview');
+        if (preview) preview.remove();
+        document.getElementById('upload-zone').classList.remove('has-file');
+        document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
+    }
 
-if (item.receipt) {
-document.getElementById('exp-file-label').innerText = "以前の画像あり (変更時タップ)";
-document.getElementById('upload-zone').classList.add('has-file');
-} else {
-document.getElementById('exp-file-label').innerText = "タップして領収書をインポート";
-document.getElementById('upload-zone').classList.remove('has-file');
-}
-
-const pills = document.getElementById('exp-campus-pills');
-pills.querySelectorAll('.pill-btn').forEach(btn => {
-if (btn.innerText === item.campus) {
-setExpCampus(item.campus, btn);
-}
-});
+    const pills = document.getElementById('exp-campus-pills');
+    pills.querySelectorAll('.pill-btn').forEach(btn => {
+        if (btn.innerText === item.campus) {
+            setExpCampus(item.campus, btn);
+        }
+    });
 }
 
 function toggleExpensePaid(idx) {
